@@ -11,3 +11,6 @@ demo/mvnw*
 demo/*.iml
 demo/logs
 demo/.env
+
+# Ignore local database
+Data/
