@@ -6,12 +6,15 @@ import {
   DeleteOutlined, 
   EyeOutlined,
   SearchOutlined,
-  ReloadOutlined 
+  ReloadOutlined,
+  LockOutlined,
+  UnlockOutlined,
+  KeyOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 
-const NhanKhauListPage = () => {
+const TaiKhoanListPage = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,9 +30,7 @@ const NhanKhauListPage = () => {
   useEffect(() => {
     if (searchText) {
       const filtered = data.filter(item =>
-        item.hoTen?.toLowerCase().includes(searchText.toLowerCase()) ||
-        item.cccd?.includes(searchText) ||
-        item.soDienThoai?.includes(searchText)
+        item.tenDangNhap?.toLowerCase().includes(searchText.toLowerCase())
       );
       setFilteredData(filtered);
     } else {
@@ -40,7 +41,7 @@ const NhanKhauListPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/nhankhau');
+      const response = await apiClient.get('/admin/taikhoan');
       console.log('Fetched data:', response.data);
       setData(response.data);
       setFilteredData(response.data);
@@ -56,18 +57,49 @@ const NhanKhauListPage = () => {
   const handleDelete = (id) => {
     Modal.confirm({
       title: 'Xác nhận xóa',
-      content: 'Bạn có chắc chắn muốn xóa nhân khẩu này?',
+      content: 'Bạn có chắc chắn muốn xóa tài khoản này?',
       okText: 'Xóa',
       okType: 'danger',
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await apiClient.delete(`/nhankhau/${id}`);
-          message.success('Xóa nhân khẩu thành công');
+          await apiClient.delete(`/admin/taikhoan/${id}`);
+          message.success('Xóa tài khoản thành công');
           fetchData();
         } catch (error) {
           console.error('Error deleting:', error);
-          message.error(error.response?.data?.message || 'Không thể xóa nhân khẩu');
+          message.error(error.response?.data?.message || 'Không thể xóa tài khoản');
+        }
+      }
+    });
+  };
+
+  const handleToggleLock = async (id, trangThai) => {
+    try {
+      await apiClient.put(`/admin/taikhoan/${id}/lock`);
+      message.success(trangThai === 'Locked' ? 'Đã mở khóa tài khoản' : 'Đã khóa tài khoản');
+      fetchData();
+    } catch (error) {
+      console.error('Error toggling lock:', error);
+      message.error(error.response?.data?.message || 'Không thể thay đổi trạng thái tài khoản');
+    }
+  };
+
+  const handleResetPassword = (id, tenDangNhap) => {
+    Modal.confirm({
+      title: 'Reset mật khẩu',
+      content: `Bạn có chắc chắn muốn reset mật khẩu cho tài khoản "${tenDangNhap}"?`,
+      okText: 'Reset',
+      cancelText: 'Hủy',
+      onOk: async () => {
+        try {
+          await apiClient.put(`/admin/taikhoan/${id}/reset-password`, {
+            newPassword: 'password123' // Mật khẩu mặc định
+          });
+          message.success('Đã reset mật khẩu thành "password123"');
+        } catch (error) {
+          console.error('Error resetting password:', error);
+          message.error(error.response?.data?.message || 'Không thể reset mật khẩu');
         }
       }
     });
@@ -82,59 +114,52 @@ const NhanKhauListPage = () => {
       render: (_, __, index) => index + 1,
     },
     {
-      title: 'Họ và tên',
-      dataIndex: 'hoTen',
-      key: 'hoTen',
-      sorter: (a, b) => a.hoTen?.localeCompare(b.hoTen),
+      title: 'Tên đăng nhập',
+      dataIndex: 'tenDangNhap',
+      key: 'tenDangNhap',
+      sorter: (a, b) => a.tenDangNhap?.localeCompare(b.tenDangNhap),
       render: (text) => <strong>{text}</strong>,
     },
     {
-      title: 'Giới tính',
-      dataIndex: 'gioiTinh',
-      key: 'gioiTinh',
-      width: 100,
+      title: 'Vai trò',
+      dataIndex: 'vaiTro',
+      key: 'vaiTro',
+      width: 200,
+      render: (vaiTro) => {
+        const colors = {
+          'ADMIN_HE_THONG': 'red',
+          'QUAN_LY_KHU': 'orange',
+          'KE_TOAN': 'blue',
+          'USER': 'green'
+        };
+        return (
+          <Tag color={colors[vaiTro?.tenVaiTro] || 'default'}>
+            {vaiTro?.tenVaiTro || 'N/A'}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: 'Trạng thái',
+      dataIndex: 'trangThai',
+      key: 'trangThai',
+      width: 120,
       align: 'center',
       filters: [
-        { text: 'Nam', value: 'Nam' },
-        { text: 'Nữ', value: 'Nữ' },
+        { text: 'Hoạt động', value: 'Active' },
+        { text: 'Bị khóa', value: 'Locked' },
       ],
-      onFilter: (value, record) => record.gioiTinh === value,
-      render: (text) => (
-        <Tag color={text === 'Nam' ? 'blue' : 'pink'}>
-          {text}
+      onFilter: (value, record) => record.trangThai === value,
+      render: (trangThai) => (
+        <Tag color={trangThai === 'Locked' ? 'red' : 'green'}>
+          {trangThai === 'Locked' ? 'Bị khóa' : 'Hoạt động'}
         </Tag>
       ),
     },
     {
-      title: 'Ngày sinh',
-      dataIndex: 'ngaySinh',
-      key: 'ngaySinh',
-      width: 120,
-      sorter: (a, b) => new Date(a.ngaySinh) - new Date(b.ngaySinh),
-      render: (date) => date ? new Date(date).toLocaleDateString('vi-VN') : '',
-    },
-    {
-      title: 'CCCD',
-      dataIndex: 'cccd',
-      key: 'cccd',
-      width: 140,
-    },
-    {
-      title: 'Số điện thoại',
-      dataIndex: 'soDienThoai',
-      key: 'soDienThoai',
-      width: 130,
-    },
-    {
-      title: 'Địa chỉ thường trú',
-      dataIndex: 'diaChiThuongTru',
-      key: 'diaChiThuongTru',
-      ellipsis: true,
-    },
-    {
       title: 'Thao tác',
       key: 'action',
-      width: 180,
+      width: 300,
       align: 'center',
       fixed: 'right',
       render: (_, record) => (
@@ -144,7 +169,7 @@ const NhanKhauListPage = () => {
             ghost
             size="small"
             icon={<EyeOutlined />}
-            onClick={() => navigate(`/admin/nhankhau/form/view/${record.id}`)}
+            onClick={() => navigate(`/dashboard/admin/taikhoan/form/view/${record.id}`)}
           >
             Xem
           </Button>
@@ -152,9 +177,24 @@ const NhanKhauListPage = () => {
             type="default"
             size="small"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/admin/nhankhau/form/edit/${record.id}`)}
+            onClick={() => navigate(`/dashboard/admin/taikhoan/form/edit/${record.id}`)}
           >
             Sửa
+          </Button>
+          <Button
+            type={record.trangThai === 'Locked' ? 'primary' : 'default'}
+            size="small"
+            icon={record.trangThai === 'Locked' ? <UnlockOutlined /> : <LockOutlined />}
+            onClick={() => handleToggleLock(record.id, record.trangThai)}
+          >
+            {record.trangThai === 'Locked' ? 'Mở' : 'Khóa'}
+          </Button>
+          <Button
+            size="small"
+            icon={<KeyOutlined />}
+            onClick={() => handleResetPassword(record.id, record.tenDangNhap)}
+          >
+            Reset
           </Button>
           <Button
             danger
@@ -185,7 +225,7 @@ const NhanKhauListPage = () => {
             margin: 0,
             color: '#1890ff'
           }}>
-            Quản lý Nhân khẩu
+            Quản lý Tài khoản
           </h2>
         </div>
 
@@ -199,7 +239,7 @@ const NhanKhauListPage = () => {
         }}>
           <Space>
             <Input
-              placeholder="Tìm kiếm theo tên, CCCD, SĐT..."
+              placeholder="Tìm kiếm theo tên đăng nhập..."
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -218,17 +258,17 @@ const NhanKhauListPage = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => navigate('/admin/nhankhau/form/new')}
+            onClick={() => navigate('/dashboard/admin/taikhoan/form/new')}
             size="large"
           >
-            Thêm nhân khẩu
+            Thêm tài khoản
           </Button>
         </div>
 
         {/* Statistics */}
         <div style={{ marginBottom: '16px' }}>
           <Tag color="blue">
-            Tổng số: {filteredData.length} nhân khẩu
+            Tổng số: {filteredData.length} tài khoản
           </Tag>
           {searchText && (
             <Tag color="green">
@@ -249,7 +289,7 @@ const NhanKhauListPage = () => {
             showTotal: (total) => `Tổng ${total} bản ghi`,
             pageSizeOptions: ['10', '20', '50', '100'],
           }}
-          scroll={{ x: 1200 }}
+          scroll={{ x: 1000 }}
           bordered
         />
       </div>
@@ -257,4 +297,4 @@ const NhanKhauListPage = () => {
   );
 };
 
-export default NhanKhauListPage;
+export default TaiKhoanListPage;

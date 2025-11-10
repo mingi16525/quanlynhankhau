@@ -9,12 +9,13 @@ const { Option } = Select;
 const TaiKhoanFormPage = () => {
     const [form] = Form.useForm();
     const navigate = useNavigate();
-    const { mode, id } = useParams(); // mode: 'edit' hoặc undefined (new)
+    const { mode, id } = useParams(); // mode: 'edit', 'view' hoặc 'new'
     const [loading, setLoading] = useState(false);
     const [vaiTroList, setVaiTroList] = useState([]);
     const [initialData, setInitialData] = useState(null);
 
     const isEditMode = mode === 'edit';
+    const isViewMode = mode === 'view';
 
     // Load danh sách vai trò
     const fetchVaiTro = async () => {
@@ -28,7 +29,7 @@ const TaiKhoanFormPage = () => {
         }
     };
 
-    // Load thông tin tài khoản (nếu sửa)
+    // Load thông tin tài khoản (nếu sửa hoặc xem)
     const fetchTaiKhoan = async () => {
         if (!id) return;
         
@@ -55,10 +56,10 @@ const TaiKhoanFormPage = () => {
 
     useEffect(() => {
         fetchVaiTro();
-        if (isEditMode) {
+        if (isEditMode || isViewMode) {
             fetchTaiKhoan();
         }
-    }, [id, isEditMode]);
+    }, [id, isEditMode, isViewMode]);
 
     // Xử lý submit
     const onFinish = async (values) => {
@@ -118,7 +119,7 @@ const TaiKhoanFormPage = () => {
         }
     };
 
-    if (isEditMode && loading && !initialData) {
+    if ((isEditMode || isViewMode) && loading && !initialData) {
         return (
             <Card>
                 <div style={{ textAlign: 'center', padding: '50px' }}>
@@ -130,7 +131,10 @@ const TaiKhoanFormPage = () => {
 
     return (
         <Card 
-            title={isEditMode ? 'Sửa tài khoản' : 'Thêm tài khoản mới'}
+            title={
+                isViewMode ? 'Xem chi tiết tài khoản' :
+                isEditMode ? 'Sửa tài khoản' : 'Thêm tài khoản mới'
+            }
             extra={
                 <Button 
                     icon={<ArrowLeftOutlined />}
@@ -148,6 +152,7 @@ const TaiKhoanFormPage = () => {
                     trangThai: 'Active'
                 }}
                 style={{ maxWidth: 600 }}
+                disabled={isViewMode}
             >
                 <Form.Item
                     label="Tên đăng nhập"
@@ -167,46 +172,54 @@ const TaiKhoanFormPage = () => {
                     />
                 </Form.Item>
 
-                <Form.Item
-                    label="Mật khẩu"
-                    name="matKhau"
-                    rules={[
-                        { 
-                            required: !isEditMode, 
-                            message: 'Vui lòng nhập mật khẩu' 
-                        },
-                        { 
-                            min: 6, 
-                            message: 'Mật khẩu phải có ít nhất 6 ký tự' 
-                        }
-                    ]}
-                    extra={isEditMode ? 'Để trống nếu không muốn đổi mật khẩu' : ''}
-                >
-                    <Input.Password placeholder={isEditMode ? 'Nhập mật khẩu mới (nếu muốn đổi)' : 'Nhập mật khẩu'} />
-                </Form.Item>
-
-                <Form.Item
-                    label="Xác nhận mật khẩu"
-                    name="xacNhanMatKhau"
-                    dependencies={['matKhau']}
-                    rules={[
-                        { 
-                            required: !isEditMode, 
-                            message: 'Vui lòng xác nhận mật khẩu' 
-                        },
-                        ({ getFieldValue }) => ({
-                            validator(_, value) {
-                                const matKhau = getFieldValue('matKhau');
-                                if (!matKhau || !value || matKhau === value) {
-                                    return Promise.resolve();
+                {!isViewMode && (
+                    <>
+                        <Form.Item
+                            label="Mật khẩu"
+                            name="matKhau"
+                            rules={[
+                                { 
+                                    required: !isEditMode, 
+                                    message: 'Vui lòng nhập mật khẩu' 
+                                },
+                                { 
+                                    min: 6, 
+                                    message: 'Mật khẩu phải có ít nhất 6 ký tự' 
                                 }
-                                return Promise.reject(new Error('Mật khẩu xác nhận không khớp'));
-                            },
-                        }),
-                    ]}
-                >
-                    <Input.Password placeholder="Nhập lại mật khẩu" />
-                </Form.Item>
+                            ]}
+                            extra={isEditMode ? 'Để trống nếu không muốn đổi mật khẩu' : ''}
+                        >
+                            <Input.Password placeholder={isEditMode ? 'Nhập mật khẩu mới (nếu muốn đổi)' : 'Nhập mật khẩu'} />
+                        </Form.Item>
+
+                        <Form.Item
+                            label="Xác nhận mật khẩu"
+                            name="xacNhanMatKhau"
+                            dependencies={['matKhau']}
+                            rules={[
+                                ({ getFieldValue }) => ({
+                                    validator(_, value) {
+                                        const matKhau = getFieldValue('matKhau');
+                                        // Nếu không nhập mật khẩu (edit mode) thì không cần xác nhận
+                                        if (!matKhau) {
+                                            return Promise.resolve();
+                                        }
+                                        // Nếu có nhập mật khẩu thì phải xác nhận
+                                        if (!value) {
+                                            return Promise.reject(new Error('Vui lòng xác nhận mật khẩu'));
+                                        }
+                                        if (matKhau === value) {
+                                            return Promise.resolve();
+                                        }
+                                        return Promise.reject(new Error('Mật khẩu xác nhận không khớp'));
+                                    },
+                                }),
+                            ]}
+                        >
+                            <Input.Password placeholder="Nhập lại mật khẩu" />
+                        </Form.Item>
+                    </>
+                )}
 
                 <Form.Item
                     label="Vai trò"
@@ -230,27 +243,45 @@ const TaiKhoanFormPage = () => {
                     name="trangThai"
                     rules={[{ required: true, message: 'Vui lòng chọn trạng thái' }]}
                 >
-                    <Select>
+                    <Select disabled={initialData?.tenDangNhap === 'admin'}>
                         <Option value="Active">Hoạt động</Option>
                         <Option value="Locked">Bị khóa</Option>
                     </Select>
                 </Form.Item>
 
-                <Form.Item>
-                    <Space>
-                        <Button 
-                            type="primary" 
-                            htmlType="submit"
-                            icon={<SaveOutlined />}
-                            loading={loading}
-                        >
-                            {isEditMode ? 'Cập nhật' : 'Tạo tài khoản'}
-                        </Button>
-                        <Button onClick={() => navigate('/dashboard/admin/taikhoan')}>
-                            Hủy
-                        </Button>
-                    </Space>
-                </Form.Item>
+                {!isViewMode && (
+                    <Form.Item>
+                        <Space>
+                            <Button 
+                                type="primary" 
+                                htmlType="submit"
+                                icon={<SaveOutlined />}
+                                loading={loading}
+                            >
+                                {isEditMode ? 'Cập nhật' : 'Tạo tài khoản'}
+                            </Button>
+                            <Button onClick={() => navigate('/dashboard/admin/taikhoan')}>
+                                Hủy
+                            </Button>
+                        </Space>
+                    </Form.Item>
+                )}
+
+                {isViewMode && (
+                    <Form.Item>
+                        <Space>
+                            <Button 
+                                type="primary"
+                                onClick={() => navigate(`/dashboard/admin/taikhoan/form/edit/${id}`)}
+                            >
+                                Chỉnh sửa
+                            </Button>
+                            <Button onClick={() => navigate('/dashboard/admin/taikhoan')}>
+                                Quay lại
+                            </Button>
+                        </Space>
+                    </Form.Item>
+                )}
             </Form>
         </Card>
     );
