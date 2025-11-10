@@ -1,0 +1,13 @@
+# Node / React
+quanlynhankhau-frontend/node_modules
+quanlynhankhau-frontend/dist
+quanlynhankhau-frontend/.env.local
+
+# Java / Spring Boot
+demo/target
+demo/.idea
+demo/.mvn
+demo/mvnw*
+demo/*.iml
+demo/logs
+demo/.env
