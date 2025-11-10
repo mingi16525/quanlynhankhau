@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: demo
+  datasource:
+    # Sử dụng biến môi trường DATABASE_URL từ Render
+    url: ${DATABASE_URL:jdbc:mysql://localhost:3306/QuanLyNhanKhauDB?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:admin}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false  # Tắt show-sql trong production
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: false
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+
+jwt:
+  secret: ${JWT_SECRET:your-very-secure-secret-key-here-1234567890}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+server:
+  port: ${PORT:8080}
+
+# Spring Boot Actuator for health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized

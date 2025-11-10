@@ -1,16 +1,43 @@
-# Node / React
-quanlynhankhau-frontend/node_modules
-quanlynhankhau-frontend/dist
-quanlynhankhau-frontend/.env.local
+# ===== Common ignores =====
+*.log
+*.tmp
+*.bak
+.DS_Store
+node_modules/
+dist/
+build/
 
-# Java / Spring Boot
-demo/target
-demo/.idea
+# ===== Java / Spring Boot =====
+*.class
+*.jar
+*.war
+*.ear
+target/
+.idea/
+*.iml
 demo/.mvn
 demo/mvnw*
-demo/*.iml
 demo/logs
 demo/.env
 
-# Ignore local database
+# ===== React / Frontend =====
+quanlynhankhau-frontend/node_modules/
+quanlynhankhau-frontend/.next/
+quanlynhankhau-frontend/.env.local
+quanlynhankhau-frontend/.env.development.local
+quanlynhankhau-frontend/.env.production.local
+# Keep .env.development and .env.production for deployment
+!quanlynhankhau-frontend/.env.development
+!quanlynhankhau-frontend/.env.production
+
+# ===== Database & system data =====
 Data/
+*.db
+*.mv.db
+*.sqlite
+*.h2.db
+
+# ===== OS files =====
+Thumbs.db
+ehthumbs.db
+desktop.ini

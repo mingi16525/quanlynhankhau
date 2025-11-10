@@ -1,0 +1,371 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Form, 
+  Input, 
+  DatePicker, 
+  Select, 
+  Button, 
+  Card, 
+  message, 
+  Space,
+  Row,
+  Col,
+  Spin,
+  Alert
+} from 'antd';
+import { 
+  SaveOutlined, 
+  RollbackOutlined, 
+  EditOutlined,
+  CopyOutlined
+} from '@ant-design/icons';
+import { useNavigate, useParams } from 'react-router-dom';
+import apiClient from '../../api/apiClient';
+import dayjs from 'dayjs';
+
+const { TextArea } = Input;
+const { Option } = Select;
+
+const NhanKhauFormPage = () => {
+  const navigate = useNavigate();
+  const { mode, id } = useParams();
+  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Xác định chế độ
+  const isViewMode = mode === 'view';
+  const isEditMode = mode === 'edit';
+  const isCloneMode = mode === 'clone';
+  const isNewMode = !mode || mode === 'new';
+
+  const getTitle = () => {
+    if (isViewMode) return 'Chi tiết Nhân khẩu';
+    if (isEditMode) return 'Chỉnh sửa Nhân khẩu';
+    if (isCloneMode) return 'Sao chép Nhân khẩu';
+    return 'Thêm Nhân khẩu mới';
+  };
+
+  // Fetch data khi có ID (view, edit, clone)
+  useEffect(() => {
+    if (id && (isViewMode || isEditMode || isCloneMode)) {
+      fetchNhanKhau();
+    }
+  }, [id, mode]);
+
+  const fetchNhanKhau = async () => {
+    setLoading(true);
+    try {
+      const response = await apiClient.get(`/nhankhau/${id}`);
+      const data = response.data;
+      
+      console.log('📥 Received data from API:', data);
+
+      // Convert LocalDate string → dayjs object
+      if (data.ngaySinh) {
+        data.ngaySinh = dayjs(data.ngaySinh);
+      }
+
+      // Xử lý chế độ CLONE
+      if (isCloneMode) {
+        delete data.id;
+        data.soCCCD = ''; // CCCD phải unique
+        data.hoTen = `[Bản sao] ${data.hoTen}`;
+        message.info('⚠️ Đây là bản sao. Vui lòng nhập CCCD mới!');
+      }
+      
+      form.setFieldsValue(data);
+      console.log('✅ Form loaded with data:', form.getFieldsValue());
+      
+    } catch (error) {
+      console.error('❌ Error fetching data:', error);
+      message.error('Không thể tải thông tin nhân khẩu');
+      navigate('/dashboard/nhankhau');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      // Convert dayjs → ISO string (LocalDate format: YYYY-MM-DD)
+      const payload = {
+        ...values,
+        ngaySinh: values.ngaySinh ? values.ngaySinh.format('YYYY-MM-DD') : null,
+      };
+
+      console.log('📤 Submitting payload:', payload);
+
+      if (isEditMode && id) {
+        await apiClient.put(`/nhankhau/${id}`, payload);
+        message.success('✅ Cập nhật nhân khẩu thành công');
+      } else {
+        await apiClient.post('/nhankhau', payload);
+        message.success(isCloneMode ? '✅ Sao chép thành công' : '✅ Thêm mới thành công');
+      }
+
+      navigate('/dashboard/nhankhau');
+    } catch (error) {
+      console.error('❌ Error submitting:', error);
+      message.error(error.response?.data?.message || 'Có lỗi xảy ra');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    navigate('/dashboard/nhankhau');
+  };
+
+  const handleEdit = () => {
+    navigate(`/dashboard/nhankhau/form/edit/${id}`);
+  };
+
+  const handleClone = () => {
+    navigate(`/dashboard/nhankhau/form/clone/${id}`);
+  };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '400px' 
+      }}>
+        <Spin size="large" tip="Đang tải dữ liệu..." />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: '24px' }}>
+      <Card
+        title={<h2 style={{ margin: 0, color: '#1890ff' }}>{getTitle()}</h2>}
+        extra={
+          isViewMode && (
+            <Space>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={handleEdit}
+              >
+                Chỉnh sửa
+              </Button>
+              <Button
+                icon={<CopyOutlined />}
+                onClick={handleClone}
+              >
+                Sao chép
+              </Button>
+            </Space>
+          )
+        }
+      >
+        {isCloneMode && (
+          <Alert
+            message="Chế độ sao chép"
+            description="Bạn đang tạo bản sao từ hồ sơ hiện tại. Vui lòng nhập CCCD mới vì CCCD phải là duy nhất."
+            type="info"
+            showIcon
+            style={{ marginBottom: '24px' }}
+            closable
+          />
+        )}
+
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          disabled={isViewMode}
+          requiredMark={!isViewMode}
+        >
+          {/* ========== THÔNG TIN CƠ BẢN ========== */}
+          <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#1890ff' }}>
+            Thông tin cơ bản
+          </h3>
+          
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="hoTen"
+                label="Họ và tên"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập họ tên!' },
+                  { min: 2, message: 'Họ tên phải có ít nhất 2 ký tự!' }
+                ]}
+              >
+                <Input placeholder="Nguyễn Văn A" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="gioiTinh"
+                label="Giới tính"
+                rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+              >
+                <Select placeholder="Chọn giới tính">
+                  <Option value="Nam">Nam</Option>
+                  <Option value="Nữ">Nữ</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="ngaySinh"
+                label="Ngày sinh"
+                rules={[{ required: true, message: 'Vui lòng chọn ngày sinh!' }]}
+              >
+                <DatePicker
+                  style={{ width: '100%' }}
+                  format="DD/MM/YYYY"
+                  placeholder="Chọn ngày sinh"
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="soCCCD"
+                label="Số CCCD"
+                rules={[
+                  { required: true, message: 'Vui lòng nhập số CCCD!' },
+                  { pattern: /^\d{12}$/, message: 'CCCD phải có 12 chữ số!' }
+                ]}
+                extra={isCloneMode && <span style={{ color: '#ff4d4f' }}>⚠️ Vui lòng nhập CCCD mới</span>}
+              >
+                <Input 
+                  placeholder="001234567890" 
+                  maxLength={12}
+                  status={isCloneMode && !form.getFieldValue('soCCCD') ? 'error' : ''}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ========== QUỐC TỊCH & DÂN TỘC ========== */}
+          <h3 style={{ marginTop: '24px', marginBottom: '16px', color: '#1890ff' }}>
+            Quốc tịch & Dân tộc
+          </h3>
+
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="danToc"
+                label="Dân tộc"
+                initialValue="Kinh"
+              >
+                <Input placeholder="Kinh" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="tonGiao"
+                label="Tôn giáo"
+              >
+                <Input placeholder="Không" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="queQuan"
+                label="Quê quán"
+              >
+                <Input placeholder="Hà Nội" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ========== NGHỀ NGHIỆP ========== */}
+          <h3 style={{ marginTop: '24px', marginBottom: '16px', color: '#1890ff' }}>
+            Nghề nghiệp
+          </h3>
+
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="ngheNghiep"
+                label="Nghề nghiệp"
+              >
+                <Input placeholder="Kỹ sư, Giáo viên, Học sinh..." />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="noiLamViec"
+                label="Nơi làm việc/Học tập"
+              >
+                <Input placeholder="Công ty ABC, Trường ĐH XYZ..." />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ========== TÌNH TRẠNG ========== */}
+          <h3 style={{ marginTop: '24px', marginBottom: '16px', color: '#1890ff' }}>
+            Tình trạng cư trú
+          </h3>
+
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="tinhTrang"
+                label="Tình trạng"
+                rules={[{ required: true, message: 'Vui lòng chọn tình trạng!' }]}
+              >
+                <Select placeholder="Chọn tình trạng">
+                  <Option value="Thường trú">Thường trú</Option>
+                  <Option value="Tạm trú">Tạm trú</Option>
+                  <Option value="Đã mất">Đã mất</Option>
+                  <Option value="Tạm vắng">Tạm vắng</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12}>
+              <Form.Item
+                name="ghiChu"
+                label="Ghi chú"
+              >
+                <TextArea rows={3} placeholder="Thông tin bổ sung..." />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ========== ACTION BUTTONS ========== */}
+          <Form.Item style={{ marginTop: '32px', marginBottom: 0 }}>
+            <Space>
+              {!isViewMode && (
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<SaveOutlined />}
+                  loading={submitting}
+                  size="large"
+                >
+                  {isEditMode ? 'Cập nhật' : isCloneMode ? 'Lưu bản sao' : 'Lưu'}
+                </Button>
+              )}
+              <Button
+                icon={<RollbackOutlined />}
+                onClick={handleCancel}
+                size="large"
+              >
+                {isViewMode ? 'Quay lại' : 'Hủy'}
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Card>
+    </div>
+  );
+};
+
+export default NhanKhauFormPage;
