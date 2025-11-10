@@ -37,10 +37,7 @@ services:
     rootDir: quanlynhankhau-frontend
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: quanlynhankhau-backend
-          property: url
+        value: https://quanlynhankhau-backend.onrender.com
     routes:
       - type: rewrite
         source: /*
@@ -49,6 +46,6 @@ services:
 # Database
 databases:
   - name: quanlynhankhau-db
-    databaseName: QuanLyNhanKhauDB
+    databaseName: quanlynhankhaudb
     user: quanlynhankhau_user
     plan: free  # Hoặc starter, standard tùy theo nhu cầu
