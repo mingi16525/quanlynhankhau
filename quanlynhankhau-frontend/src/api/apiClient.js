@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+    // Trong dev mode, dùng /api để đi qua Vite proxy
+    // Trong production, dùng VITE_API_BASE_URL từ .env
+    baseURL: import.meta.env.DEV ? '/api' : (import.meta.env.VITE_API_BASE_URL + '/api'),
     headers: {
         'Content-Type': 'application/json',
     },
