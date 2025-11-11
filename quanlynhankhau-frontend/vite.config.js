@@ -9,10 +9,10 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: 3000,
-      host: '', // Cho phép truy cập từ bên ngoài (localhost và LAN)
+      host: '0.0.0.0', // Cho phép truy cập từ bên ngoài (localhost và LAN)
       proxy: {
         '/api': {
-          target: env.VITE_API_BASE_URL || 'http://localhost:8080',
+          target: env.VITE_API_URL || 'http://localhost:8080',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path, // ✅ Giữ nguyên path /api

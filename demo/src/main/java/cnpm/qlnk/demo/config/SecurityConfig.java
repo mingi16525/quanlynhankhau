@@ -62,10 +62,10 @@ public class SecurityConfig {
         
         CorsConfiguration configuration = new CorsConfiguration();
         // Allow both local development and production frontend
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "http://localhost:5173",  // Vite default port
-            "https://*.onrender.com"  // Render frontend domain
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:*",
+            "https://*.devtunnels.ms",  // VS Code Port Forward
+            "https://*.onrender.com"     // Render frontend domain
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

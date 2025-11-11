@@ -112,8 +112,7 @@ const AppRoutes = () => {
         {/* Admin */}
         <Route path="admin/taikhoan" element={<TaiKhoanListPage />} />
         <Route path="admin/taikhoan/form/new" element={<TaiKhoanFormPage />} />
-        <Route path="admin/taikhoan/form/edit/:id" element={<TaiKhoanFormPage />} />
-
+        <Route path="admin/taikhoan/form/:mode/:id" element={<TaiKhoanFormPage />} />
         {/* Báo cáo */}
         <Route path="baocao" element={<BaoCaoPage />} />
       </Route>
