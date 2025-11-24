@@ -6,6 +6,7 @@ import cnpm.qlnk.demo.entity.KhoanChiPhiBatBuoc;
 import cnpm.qlnk.demo.repository.DanhSachThuPhiRepository;
 import cnpm.qlnk.demo.repository.HoKhauRepository;
 import cnpm.qlnk.demo.repository.KhoanChiPhiBatBuocRepository;
+import cnpm.qlnk.demo.repository.ThanhVienHoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,9 @@ public class DanhSachThuPhiService {
 
     @Autowired
     private KhoanChiPhiBatBuocRepository khoanPhiRepository;
+    
+    @Autowired
+    private ThanhVienHoRepository thanhVienHoRepository;
 
     // ========== CRUD CƠ BẢN ==========
     
@@ -92,11 +96,14 @@ public class DanhSachThuPhiService {
         return stats;
     }
 
-    // ========== ✅ TẠO DANH SÁCH THU MỚI - TÍNH TIỀN THEO HỘ ==========
+    // ========== ✅ TẠO DANH SÁCH THU MỚI - LOGIC MỚI ==========
     
     /**
      * Tạo danh sách thu cho TẤT CẢ hộ khẩu dựa trên một khoản phí
-     * ✅ LOGIC MỚI: Mỗi hộ đóng CÙNG 1 SỐ TIỀN (không phụ thuộc số người)
+     * LOGIC TÍNH TIỀN:
+     * - "Theo hộ": Mỗi hộ đóng SỐ TIỀN CỐ ĐỊNH (soTienMoiHo)
+     * - "Theo số thành viên hộ": Số tiền = soTienMoiHo × số thành viên
+     * - "Tự nguyện": Mặc định = 0, kế toán tự điền sau
      */
     @Transactional
     public Map<String, Object> createThuPhiChoTatCaHo(Long khoanPhiId) {
@@ -109,10 +116,10 @@ public class DanhSachThuPhiService {
         }
         
         KhoanChiPhiBatBuoc khoanPhi = khoanPhiOpt.get();
+        String loaiKhoanPhi = khoanPhi.getLoaiKhoanPhi();
+        BigDecimal donGia = khoanPhi.getSoTienMoiHo();
         
-        // ✅ SỐ TIỀN CỐ ĐỊNH CHO MỖI HỘ
-        BigDecimal soTienMoiHo = khoanPhi.getSoTienMoiHo();
-        System.out.println("💰 Số tiền mỗi hộ: " + soTienMoiHo);
+        System.out.println("💰 Loại khoản phí: " + loaiKhoanPhi + " - Đơn giá: " + donGia);
         
         // Lấy TẤT CẢ hộ khẩu
         List<HoKhau> allHoKhau = hoKhauRepository.findAll();
@@ -120,6 +127,7 @@ public class DanhSachThuPhiService {
         
         List<DanhSachThuPhi> created = new ArrayList<>();
         List<String> skipped = new ArrayList<>();
+        BigDecimal tongTien = BigDecimal.ZERO;
         
         for (HoKhau hoKhau : allHoKhau) {
             // Kiểm tra đã tạo chưa
@@ -130,31 +138,63 @@ public class DanhSachThuPhiService {
                 continue;
             }
             
-            // ✅ TÍNH TIỀN: MỖI HỘ ĐÓNG CÙNG 1 SỐ TIỀN
-            // Không cần tính theo số nhân khẩu nữa
+            // ✅ TÍNH TIỀN THEO LOẠI KHOẢN PHÍ
+            BigDecimal soTien;
+            
+            switch (loaiKhoanPhi) {
+                case "Theo hộ":
+                    // Số tiền cố định cho mỗi hộ
+                    soTien = donGia;
+                    System.out.println("  → Theo hộ: " + soTien);
+                    break;
+                    
+                case "Theo số thành viên hộ":
+                    // Số tiền = đơn giá × số thành viên
+                    int soThanhVien = thanhVienHoRepository.findByHoKhau_Id(hoKhau.getId()).size();
+                    soTien = donGia.multiply(BigDecimal.valueOf(soThanhVien));
+                    System.out.println("  → Theo SV - Hộ ID: " + hoKhau.getId() + 
+                                     ", Số thành viên: " + soThanhVien + 
+                                     ", Đơn giá: " + donGia + 
+                                     ", Tổng: " + soTien);
+                    break;
+                    
+                case "Tự nguyện":
+                    // Mặc định = 0, kế toán sẽ điền sau
+                    soTien = BigDecimal.ZERO;
+                    System.out.println("  → Tự nguyện: Mặc định 0");
+                    break;
+                    
+                default:
+                    // Fallback: dùng đơn giá
+                    soTien = donGia;
+                    System.out.println("  → Mặc định: " + soTien);
+            }
             
             // Tạo khoản thu mới
             DanhSachThuPhi thuPhi = new DanhSachThuPhi();
             thuPhi.setHoKhau(hoKhau);
             thuPhi.setKhoanPhi(khoanPhi);
-            thuPhi.setSoTien(soTienMoiHo); // ✅ Số tiền cố định
+            thuPhi.setSoTien(soTien);
             thuPhi.setTrangThaiThanhToan("Chưa đóng");
             
             DanhSachThuPhi saved = thuPhiRepository.save(thuPhi);
             created.add(saved);
+            tongTien = tongTien.add(soTien);
             
             System.out.println("✅ Tạo khoản thu cho hộ: " + hoKhau.getChuHo().getHoTen() + 
-                             " - Số tiền: " + soTienMoiHo);
+                             " - Số tiền: " + soTien);
         }
         
         System.out.println("✅ Đã tạo: " + created.size() + " khoản thu");
         System.out.println("⚠️ Đã bỏ qua: " + skipped.size() + " hộ");
+        System.out.println("💰 Tổng tiền dự kiến: " + tongTien);
         
         Map<String, Object> result = new HashMap<>();
         result.put("success", created.size());
         result.put("skipped", skipped.size());
-        result.put("soTienMoiHo", soTienMoiHo);
-        result.put("tongTienDuKien", soTienMoiHo.multiply(BigDecimal.valueOf(created.size())));
+        result.put("loaiKhoanPhi", loaiKhoanPhi);
+        result.put("donGia", donGia);
+        result.put("tongTienDuKien", tongTien);
         result.put("details", skipped);
         
         return result;
@@ -176,12 +216,14 @@ public class DanhSachThuPhiService {
             throw new IllegalStateException("Hộ này đã có khoản phí này rồi");
         }
         
-        // ✅ NẾU KHÔNG TRUYỀN SỐ TIỀN, TỰ ĐỘNG LẤY TỪ KHOẢN PHÍ
+        // ✅ NẾU KHÔNG TRUYỀN SỐ TIỀN, TỰ ĐỘNG TÍNH THEO LOẠI KHOẢN PHÍ
         if (thuPhi.getSoTien() == null) {
             Optional<KhoanChiPhiBatBuoc> khoanPhiOpt = khoanPhiRepository.findById(thuPhi.getKhoanPhi().getId());
             if (khoanPhiOpt.isPresent()) {
-                thuPhi.setSoTien(khoanPhiOpt.get().getSoTienMoiHo());
-                System.out.println("✅ Tự động set số tiền: " + thuPhi.getSoTien());
+                KhoanChiPhiBatBuoc khoanPhi = khoanPhiOpt.get();
+                BigDecimal soTien = calculateSoTien(khoanPhi, thuPhi.getHoKhau());
+                thuPhi.setSoTien(soTien);
+                System.out.println("✅ Tự động tính số tiền: " + soTien);
             }
         }
         
@@ -193,6 +235,28 @@ public class DanhSachThuPhiService {
         System.out.println("✅ Created ThuPhi ID: " + saved.getId() + " - Số tiền: " + saved.getSoTien());
         
         return saved;
+    }
+    
+    // ========== HELPER: TÍNH SỐ TIỀN THEO LOẠI KHOẢN PHÍ ==========
+    
+    private BigDecimal calculateSoTien(KhoanChiPhiBatBuoc khoanPhi, HoKhau hoKhau) {
+        String loaiKhoanPhi = khoanPhi.getLoaiKhoanPhi();
+        BigDecimal donGia = khoanPhi.getSoTienMoiHo();
+        
+        switch (loaiKhoanPhi) {
+            case "Theo hộ":
+                return donGia;
+                
+            case "Theo số thành viên hộ":
+                int soThanhVien = thanhVienHoRepository.findByHoKhau_Id(hoKhau.getId()).size();
+                return donGia.multiply(BigDecimal.valueOf(soThanhVien));
+                
+            case "Tự nguyện":
+                return BigDecimal.ZERO;
+                
+            default:
+                return donGia;
+        }
     }
 
     // ========== CẬP NHẬT TRẠNG THÁI THANH TOÁN ==========
@@ -264,9 +328,10 @@ public class DanhSachThuPhiService {
             throw new IllegalArgumentException("Vui lòng chọn Khoản phí");
         }
         
-        // ✅ CHỈ VALIDATE NẾU ĐÃ CÓ SỐ TIỀN
-        if (thuPhi.getSoTien() != null && thuPhi.getSoTien().doubleValue() <= 0) {
-            throw new IllegalArgumentException("Số tiền phải lớn hơn 0");
+        // ✅ CHỈ VALIDATE NẾU ĐÃ CÓ SỐ TIỀN VÀ KHÔNG PHẢI TỰ NGUYỆN
+        // Với Tự nguyện, cho phép số tiền = 0
+        if (thuPhi.getSoTien() != null && thuPhi.getSoTien().doubleValue() < 0) {
+            throw new IllegalArgumentException("Số tiền không được âm");
         }
     }
 }

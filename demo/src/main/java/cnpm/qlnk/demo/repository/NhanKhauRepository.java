@@ -24,4 +24,8 @@ public interface NhanKhauRepository extends JpaRepository<NhanKhau, Integer> {
     @Query("SELECT CASE WHEN COUNT(h) > 0 THEN true ELSE false END " +
            "FROM HoKhau h WHERE h.chuHo.id = :nhanKhauId")
     boolean isChuHo(@Param("nhanKhauId") Integer nhanKhauId);
+    
+    // Lấy danh sách nhân khẩu CHƯA thuộc hộ khẩu nào (không có trong bảng ThanhVienHo)
+    @Query("SELECT n FROM NhanKhau n WHERE n.id NOT IN (SELECT tv.nhanKhau.id FROM ThanhVienHo tv)")
+    List<NhanKhau> findNhanKhauNotInAnyHoKhau();
 }

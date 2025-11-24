@@ -13,6 +13,7 @@ import {
   Input,
   Row,
   Col,
+  DatePicker,
 } from 'antd';
 import { 
   PlusOutlined, 
@@ -20,7 +21,8 @@ import {
   EditOutlined, 
   DeleteOutlined,
   SearchOutlined,
-  WarningOutlined
+  WarningOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
@@ -28,6 +30,7 @@ import dayjs from 'dayjs';
 
 const { TabPane } = Tabs;
 const { Search } = Input;
+const { RangePicker } = DatePicker;
 
 const TamTruTamVangListPage = () => {
     const navigate = useNavigate();
@@ -38,12 +41,27 @@ const TamTruTamVangListPage = () => {
     const [viewModalVisible, setViewModalVisible] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const [dateRange, setDateRange] = useState(null);
 
     // ========== FETCH DATA ==========
-    const fetchTamTru = async () => {
+    const fetchTamTru = async (tuNgay = null, denNgay = null) => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/tamtrutamvang/loai/tamtru');
+            let url = '/tamtrutamvang/loai/tamtru';
+            const params = [];
+            
+            if (tuNgay) {
+                params.push(`tuNgay=${tuNgay}`);
+            }
+            if (denNgay) {
+                params.push(`denNgay=${denNgay}`);
+            }
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            const response = await apiClient.get(url);
             console.log('📥 Tạm trú data:', response.data);
             setTamTruList(response.data);
         } catch (error) {
@@ -54,10 +72,24 @@ const TamTruTamVangListPage = () => {
         }
     };
 
-    const fetchTamVang = async () => {
+    const fetchTamVang = async (tuNgay = null, denNgay = null) => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/tamtrutamvang/loai/tamvang');
+            let url = '/tamtrutamvang/loai/tamvang';
+            const params = [];
+            
+            if (tuNgay) {
+                params.push(`tuNgay=${tuNgay}`);
+            }
+            if (denNgay) {
+                params.push(`denNgay=${denNgay}`);
+            }
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            const response = await apiClient.get(url);
             console.log('📥 Tạm vắng data:', response.data);
             setTamVangList(response.data);
         } catch (error) {
@@ -69,12 +101,36 @@ const TamTruTamVangListPage = () => {
     };
 
     useEffect(() => {
-        if (activeTab === 'tamtru') {
-            fetchTamTru();
-        } else {
-            fetchTamVang();
+        fetchData();
+    }, [activeTab, dateRange]);
+    
+    // Hàm fetch data chung
+    const fetchData = () => {
+        let tuNgay = null;
+        let denNgay = null;
+        
+        if (dateRange && dateRange.length === 2) {
+            tuNgay = dateRange[0].format('YYYY-MM-DD');
+            denNgay = dateRange[1].format('YYYY-MM-DD');
         }
-    }, [activeTab]);
+        
+        if (activeTab === 'tamtru') {
+            fetchTamTru(tuNgay, denNgay);
+        } else {
+            fetchTamVang(tuNgay, denNgay);
+        }
+    };
+    
+    // Xử lý thay đổi khoảng thời gian
+    const handleDateRangeChange = (dates) => {
+        setDateRange(dates);
+    };
+    
+    // Reset filter
+    const handleResetFilter = () => {
+        setDateRange(null);
+        setSearchKeyword('');
+    };
 
     // ========== TÌM KIẾM ==========
     const handleSearch = async (value) => {
@@ -278,8 +334,9 @@ const TamTruTamVangListPage = () => {
     return (
         <div style={{ padding: '24px' }}>
             <Card>
-                <Row gutter={16} style={{ marginBottom: '16px' }}>
-                    <Col xs={24} md={16}>
+                {/* Bộ lọc */}
+                <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+                    <Col xs={24} md={10}>
                         <Search
                             placeholder="Tìm theo tên, CCCD..."
                             allowClear
@@ -295,15 +352,33 @@ const TamTruTamVangListPage = () => {
                             value={searchKeyword}
                         />
                     </Col>
-                    <Col xs={24} md={8} style={{ textAlign: 'right' }}>
-                        <Button 
-                            type="primary" 
+                    <Col xs={24} md={10}>
+                        <RangePicker
+                            style={{ width: '100%' }}
                             size="large"
-                            icon={<PlusOutlined />}
-                            onClick={() => navigate('/dashboard/tamtrutamvang/new')}
-                        >
-                            Đăng ký mới
-                        </Button>
+                            placeholder={['Từ ngày đăng ký', 'Đến ngày đăng ký']}
+                            format="DD/MM/YYYY"
+                            value={dateRange}
+                            onChange={handleDateRangeChange}
+                        />
+                    </Col>
+                    <Col xs={24} md={4}>
+                        <Space>
+                            <Button 
+                                type="primary" 
+                                icon={<PlusOutlined />}
+                                size="large"
+                                onClick={() => navigate('/dashboard/tamtrutamvang/new')}
+                            >
+                                Thêm mới
+                            </Button>
+                            <Button
+                                icon={<ReloadOutlined />}
+                                size="large"
+                                onClick={handleResetFilter}
+                                title="Làm mới bộ lọc"
+                            />
+                        </Space>
                     </Col>
                 </Row>
 

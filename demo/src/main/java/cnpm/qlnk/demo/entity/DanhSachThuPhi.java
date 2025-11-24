@@ -31,6 +31,7 @@ public class DanhSachThuPhi {
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private KhoanChiPhiBatBuoc khoanPhi;
 
+    // Số tiền có thể được chỉnh sửa bởi kế toán (đặc biệt với loại Tự nguyện)
     @Column(name = "SoTien", nullable = false, precision = 15, scale = 2)
     private BigDecimal soTien;
 

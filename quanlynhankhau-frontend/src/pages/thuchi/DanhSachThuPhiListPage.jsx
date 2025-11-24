@@ -33,7 +33,9 @@ import {
   Cancel as UnpaidIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Payment as PaymentIcon
+  Payment as PaymentIcon,
+  Check as CheckIcon,
+  Close as CloseIcon
 } from '@mui/icons-material';
 import thuPhiApi from '../../api/thuPhiApi';
 import khoanPhiApi from '../../api/khoanPhiApi';
@@ -51,6 +53,8 @@ const DanhSachThuPhiListPage = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [filterTrangThai, setFilterTrangThai] = useState('all'); // 'all', 'chuadong', 'dadong'
   const [alert, setAlert] = useState({ show: false, type: '', message: '' });
+  const [editingId, setEditingId] = useState(null); // ID đang chỉnh sửa
+  const [editingSoTien, setEditingSoTien] = useState(''); // Số tiền đang chỉnh sửa
 
   // Load data
   useEffect(() => {
@@ -136,6 +140,46 @@ const DanhSachThuPhiListPage = () => {
     } catch (error) {
       console.error('Error updating status:', error);
       showAlert('error', 'Lỗi khi cập nhật trạng thái');
+    }
+  };
+  
+  // Bắt đầu chỉnh sửa số tiền
+  const handleStartEditSoTien = (id, soTien) => {
+    setEditingId(id);
+    setEditingSoTien(soTien);
+  };
+  
+  // Hủy chỉnh sửa
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditingSoTien('');
+  };
+  
+  // Lưu số tiền mới
+  const handleSaveSoTien = async (id) => {
+    if (!editingSoTien || parseFloat(editingSoTien) < 0) {
+      showAlert('error', 'Số tiền không hợp lệ');
+      return;
+    }
+    
+    try {
+      // Tìm record hiện tại
+      const currentRecord = thuPhiList.find(item => item.id === id);
+      
+      // Update với số tiền mới
+      await thuPhiApi.update(id, {
+        ...currentRecord,
+        soTien: parseFloat(editingSoTien)
+      });
+      
+      showAlert('success', 'Đã cập nhật số tiền');
+      setEditingId(null);
+      setEditingSoTien('');
+      fetchThuPhiList();
+      fetchThongKe();
+    } catch (error) {
+      console.error('Error updating soTien:', error);
+      showAlert('error', 'Lỗi khi cập nhật số tiền');
     }
   };
 
@@ -395,9 +439,46 @@ const DanhSachThuPhiListPage = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Typography color="primary" fontWeight="bold">
-                      {formatCurrency(item.soTien)}
-                    </Typography>
+                    {editingId === item.id ? (
+                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <TextField
+                          size="small"
+                          type="number"
+                          value={editingSoTien}
+                          onChange={(e) => setEditingSoTien(e.target.value)}
+                          sx={{ width: 150 }}
+                          inputProps={{ min: 0, step: 1000 }}
+                        />
+                        <IconButton 
+                          color="success" 
+                          size="small"
+                          onClick={() => handleSaveSoTien(item.id)}
+                        >
+                          <CheckIcon />
+                        </IconButton>
+                        <IconButton 
+                          color="error" 
+                          size="small"
+                          onClick={handleCancelEdit}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </Box>
+                    ) : (
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography color="primary" fontWeight="bold">
+                          {formatCurrency(item.soTien)}
+                        </Typography>
+                        <Tooltip title="Chỉnh sửa số tiền">
+                          <IconButton 
+                            size="small" 
+                            onClick={() => handleStartEditSoTien(item.id, item.soTien)}
+                          >
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Box 

@@ -25,9 +25,12 @@ public class KhoanChiPhiBatBuoc {
     private String tenKhoanPhi;
 
     @Column(name = "LoaiKhoanPhi", nullable = false)
-    private String loaiKhoanPhi; // "Bắt buộc", "Tự nguyện", "Khác"
+    private String loaiKhoanPhi; // "Theo hộ", "Theo số thành viên hộ", "Tự nguyện"
 
-    // ✅ ĐỔI TÊN: SoTienMoiNguoi → SoTienMoiHo
+    // Đơn giá cơ bản - dùng để tính toán
+    // - Theo hộ: Số tiền cố định mỗi hộ
+    // - Theo số thành viên hộ: Số tiền mỗi người (nhân với số thành viên)
+    // - Tự nguyện: Chỉ mang tính tham khảo, kế toán tự điền
     @Column(name = "SoTienMoiHo", nullable = false, precision = 15, scale = 2)
     private BigDecimal soTienMoiHo;
 

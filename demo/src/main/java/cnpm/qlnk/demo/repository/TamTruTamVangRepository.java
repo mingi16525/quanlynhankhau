@@ -41,4 +41,26 @@ public interface TamTruTamVangRepository extends JpaRepository<TamTruTamVang, Lo
     @Query("SELECT t FROM TamTruTamVang t WHERE " +
            "t.denNgay IS NULL OR t.denNgay >= :ngayHienTai")
     List<TamTruTamVang> findActive(@Param("ngayHienTai") LocalDate ngayHienTai);
+    
+    /**
+     * Tìm theo loại VÀ khoảng thời gian đăng ký (tuNgay)
+     */
+    @Query("SELECT t FROM TamTruTamVang t WHERE " +
+           "t.loai = :loai AND " +
+           "t.tuNgay >= :startDate AND t.tuNgay <= :endDate")
+    List<TamTruTamVang> findByLoaiAndTuNgayBetween(
+        @Param("loai") String loai,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
+    
+    /**
+     * Tìm tất cả trong khoảng thời gian đăng ký
+     */
+    @Query("SELECT t FROM TamTruTamVang t WHERE " +
+           "t.tuNgay >= :startDate AND t.tuNgay <= :endDate")
+    List<TamTruTamVang> findByTuNgayBetween(
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
 }

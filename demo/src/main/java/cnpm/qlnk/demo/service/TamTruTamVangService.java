@@ -178,6 +178,17 @@ public class TamTruTamVangService {
     public List<TamTruTamVang> getActive() {
         return tamTruTamVangRepository.findActive(LocalDate.now());
     }
+    
+    /**
+     * Lọc theo loại và khoảng thời gian đăng ký
+     */
+    public List<TamTruTamVang> getByLoaiAndDateRange(String loai, LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null) {
+            return tamTruTamVangRepository.findByLoaiAndTuNgayBetween(loai, startDate, endDate);
+        } else {
+            return tamTruTamVangRepository.findByLoai(loai);
+        }
+    }
 
     // ========== VALIDATION ==========
     

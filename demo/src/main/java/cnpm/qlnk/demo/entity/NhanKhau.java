@@ -38,11 +38,32 @@ public class NhanKhau {
     @Column(name = "QueQuan")
     private String queQuan;
 
+    @Column(name = "NoiSinh")
+    private String noiSinh;
+
+    @Column(name = "NguyenQuan")
+    private String nguyenQuan;
+
     @Column(name = "DanToc")
     private String danToc;
     
     @Column(name = "TonGiao")
     private String tonGiao;
+
+    @Column(name = "QuocTich")
+    private String quocTich;
+
+    @Column(name = "DiaChiThuongTru")
+    private String diaChiThuongTru;
+
+    @Column(name = "SoDienThoai")
+    private String soDienThoai;
+
+    @Column(name = "Email")
+    private String email;
+
+    @Column(name = "TrinhDoHocVan")
+    private String trinhDoHocVan;
 
     @Column(name = "TinhTrang")
     private String tinhTrang; // Ví dụ: Thường trú, Tạm trú, Đã mất

@@ -1,7 +1,6 @@
 package cnpm.qlnk.demo.repository;
 
 import cnpm.qlnk.demo.entity.DanhSachThuPhi;
-import cnpm.qlnk.demo.entity.HoKhau;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

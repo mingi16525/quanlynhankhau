@@ -10,6 +10,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ThanhVienHoRepository extends JpaRepository<ThanhVienHo, Integer> {
 
     Optional<ThanhVienHo> findByNhanKhau_Id(Integer id);
+    
+    // Kiểm tra xem nhân khẩu đã là thành viên của hộ khẩu cụ thể chưa
+    boolean existsByHoKhau_IdAndNhanKhau_Id(Integer hoKhauId, Integer nhanKhauId);
 
     boolean existsByHoKhau_Id(Integer id);
 

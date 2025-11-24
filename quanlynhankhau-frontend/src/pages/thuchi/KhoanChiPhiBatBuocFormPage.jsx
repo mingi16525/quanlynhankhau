@@ -32,7 +32,7 @@ const KhoanChiPhiBatBuocFormPage = () => {
   const [alert, setAlert] = useState({ show: false, type: '', message: '' });
   const [formData, setFormData] = useState({
     tenKhoanPhi: '',
-    loaiKhoanPhi: 'Bắt buộc',
+    loaiKhoanPhi: 'Theo hộ',
     soTienMoiHo: '',
     moTa: '',
     trangThai: 'Đang áp dụng'
@@ -218,11 +218,11 @@ const KhoanChiPhiBatBuocFormPage = () => {
                   value={formData.loaiKhoanPhi}
                   onChange={handleChange}
                   error={Boolean(errors.loaiKhoanPhi)}
-                  helperText={errors.loaiKhoanPhi}
+                  helperText={errors.loaiKhoanPhi || 'Chọn cách tính tiền'}
                 >
-                  <MenuItem value="Bắt buộc">Bắt buộc</MenuItem>
-                  <MenuItem value="Tự nguyện">Tự nguyện</MenuItem>
-                  <MenuItem value="Khác">Khác</MenuItem>
+                  <MenuItem value="Theo hộ">Theo hộ (Số tiền cố định mỗi hộ)</MenuItem>
+                  <MenuItem value="Theo số thành viên hộ">Theo số thành viên hộ (Tính theo số người)</MenuItem>
+                  <MenuItem value="Tự nguyện">Tự nguyện (Kế toán tự điền)</MenuItem>
                 </TextField>
               </Grid>
 
@@ -231,13 +231,26 @@ const KhoanChiPhiBatBuocFormPage = () => {
                 <TextField
                   fullWidth
                   required
-                  label="Số tiền mỗi hộ (VNĐ)"
+                  label={
+                    formData.loaiKhoanPhi === 'Theo hộ' 
+                      ? 'Số tiền mỗi hộ (VNĐ)'
+                      : formData.loaiKhoanPhi === 'Theo số thành viên hộ'
+                      ? 'Số tiền mỗi người (VNĐ)'
+                      : 'Số tiền tham khảo (VNĐ)'
+                  }
                   name="soTienMoiHo"
                   type="number"
                   value={formData.soTienMoiHo}
                   onChange={handleChange}
                   error={Boolean(errors.soTienMoiHo)}
-                  helperText={errors.soTienMoiHo || 'Nhập số tiền mỗi hộ phải đóng'}
+                  helperText={
+                    errors.soTienMoiHo || 
+                    (formData.loaiKhoanPhi === 'Theo hộ' 
+                      ? 'Mỗi hộ đóng số tiền này'
+                      : formData.loaiKhoanPhi === 'Theo số thành viên hộ'
+                      ? 'Số tiền sẽ nhân với số thành viên trong hộ'
+                      : 'Tự nguyện - Kế toán sẽ điền số tiền thực tế')
+                  }
                   inputProps={{ min: 0, step: 1000 }}
                 />
               </Grid>

@@ -22,6 +22,7 @@ import SuKienNhanKhauListPage from './pages/sukien/SuKienNhanKhauListPage.jsx';
 import KhoanChiPhiBatBuocListPage from './pages/thuchi/KhoanChiPhiBatBuocListPage';
 import KhoanChiPhiBatBuocFormPage from './pages/thuchi/KhoanChiPhiBatBuocFormPage';
 import DanhSachThuPhiListPage from './pages/thuchi/DanhSachThuPhiListPage';
+import BaoCaoThuPhiPage from './pages/thuchi/BaoCaoThuPhiPage';
 import HoatDongThienNguyenListPage from './pages/thuchi/HoatDongThienNguyenListPage.jsx';
 import HoatDongThienNguyenFormPage from './pages/thuchi/HoatDongThienNguyenFormPage';
 import ThuThienNguyenListPage from './pages/thuchi/ThuThienNguyenListPage';
@@ -30,6 +31,12 @@ import ThuThienNguyenFormPage from './pages/thuchi/ThuThienNguyenFormPage';
 // ✅ Import Danh sách chi components
 import DanhSachChiListPage from './pages/thuchi/DanhSachChiListPage';
 import DanhSachChiFormPage from './pages/thuchi/DanhSachChiFormPage';
+
+// ✅ Import Ghi nhận thay đổi hộ khẩu
+import GhiNhanThayDoiListPage from './pages/ghinhanthaydoi/GhiNhanThayDoiListPage';
+
+// ✅ Import Thống kê
+import ThongKeNhanKhauPage from './pages/thongke/ThongKeNhanKhauPage';
 
 // Admin
 import TaiKhoanListPage from './pages/admin/TaiKhoanListPage';
@@ -94,6 +101,9 @@ const AppRoutes = () => {
         {/* Thu phí */}
         <Route path="thuphi/khoanphi/:khoanPhiId" element={<DanhSachThuPhiListPage />} />
         
+        {/* ✅ Báo cáo thu phí */}
+        <Route path="baocao/thuphi" element={<BaoCaoThuPhiPage />} />
+        
         {/* Hoạt động thiện nguyện */}
         <Route path="hoatdongthiennguyen" element={<HoatDongThienNguyenListPage />} />
         <Route path="hoatdongthiennguyen/create" element={<HoatDongThienNguyenFormPage />} />
@@ -108,6 +118,12 @@ const AppRoutes = () => {
         <Route path="danhsachchi" element={<DanhSachChiListPage />} />
         <Route path="danhsachchi/create" element={<DanhSachChiFormPage />} />
         <Route path="danhsachchi/edit/:id" element={<DanhSachChiFormPage />} />
+
+        {/* ✅ Lịch sử thay đổi hộ khẩu */}
+        <Route path="ghinhanthaydoi" element={<GhiNhanThayDoiListPage />} />
+
+        {/* ✅ Thống kê */}
+        <Route path="thongke" element={<ThongKeNhanKhauPage />} />
 
         {/* Admin */}
         <Route path="admin/taikhoan" element={<TaiKhoanListPage />} />

@@ -3,11 +3,13 @@ package cnpm.qlnk.demo.controller;
 import cnpm.qlnk.demo.entity.TamTruTamVang;
 import cnpm.qlnk.demo.service.TamTruTamVangService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -57,12 +59,19 @@ public class TamTruTamVangController {
     /**
      * GET /api/tamtrutamvang/loai/tamtru
      * Lấy danh sách TẠM TRÚ
+     * 
+     * @param tuNgay Ngày bắt đầu đăng ký (optional)
+     * @param denNgay Ngày kết thúc đăng ký (optional)
      */
     @GetMapping("/loai/tamtru")
-    public ResponseEntity<List<TamTruTamVang>> getTamTruList() {
+    public ResponseEntity<List<TamTruTamVang>> getTamTruList(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay
+    ) {
         System.out.println("=== GET TAM TRU LIST ===");
+        System.out.println("Từ ngày: " + tuNgay + ", Đến ngày: " + denNgay);
         
-        List<TamTruTamVang> list = tamTruTamVangService.getByLoai("Tạm trú");
+        List<TamTruTamVang> list = tamTruTamVangService.getByLoaiAndDateRange("Tạm trú", tuNgay, denNgay);
         System.out.println("Found " + list.size() + " Tạm trú records");
         
         return ResponseEntity.ok(list);
@@ -71,12 +80,19 @@ public class TamTruTamVangController {
     /**
      * GET /api/tamtrutamvang/loai/tamvang
      * Lấy danh sách TẠM VẮNG
+     * 
+     * @param tuNgay Ngày bắt đầu đăng ký (optional)
+     * @param denNgay Ngày kết thúc đăng ký (optional)
      */
     @GetMapping("/loai/tamvang")
-    public ResponseEntity<List<TamTruTamVang>> getTamVangList() {
+    public ResponseEntity<List<TamTruTamVang>> getTamVangList(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate denNgay
+    ) {
         System.out.println("=== GET TAM VANG LIST ===");
+        System.out.println("Từ ngày: " + tuNgay + ", Đến ngày: " + denNgay);
         
-        List<TamTruTamVang> list = tamTruTamVangService.getByLoai("Tạm vắng");
+        List<TamTruTamVang> list = tamTruTamVangService.getByLoaiAndDateRange("Tạm vắng", tuNgay, denNgay);
         System.out.println("Found " + list.size() + " Tạm vắng records");
         
         return ResponseEntity.ok(list);

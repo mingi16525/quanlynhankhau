@@ -16,27 +16,52 @@ public class ThanhVienHoController {
 
     // POST /api/thanhvienho: Thêm nhân khẩu vào hộ khẩu
     @PostMapping
-    public ResponseEntity<ThanhVienHo> addThanhVien(@RequestBody ThanhVienHo tvh) {
+    public ResponseEntity<?> addThanhVien(@RequestBody ThanhVienHo tvh) {
         try {
             ThanhVienHo savedTvh = thanhVienHoService.addThanhVien(tvh);
             return new ResponseEntity<>(savedTvh, HttpStatus.CREATED);
         } catch (IllegalStateException e) {
-            // Lỗi nhân khẩu đã thuộc hộ khẩu khác
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); 
+            // Lỗi nhân khẩu đã thuộc hộ khẩu (trùng hoặc conflict)
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(e.getMessage())); 
         } catch (IllegalArgumentException e) {
             // Lỗi Hộ khẩu/Nhân khẩu không tồn tại
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            // Lỗi không xác định
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Lỗi hệ thống: " + e.getMessage()));
+        }
+    }
+    
+    // Inner class để trả về lỗi dạng JSON
+    private static class ErrorResponse {
+        public String message;
+        
+        public ErrorResponse(String message) {
+            this.message = message;
         }
     }
 
     // DELETE /api/thanhvienho/{id}: Xóa thành viên khỏi hộ khẩu (ID của bảng ThanhVienHo)
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeThanhVien(@PathVariable Integer id) {
+    public ResponseEntity<?> removeThanhVien(@PathVariable Integer id) {
         try {
             thanhVienHoService.removeThanhVien(id);
             return ResponseEntity.noContent().build();
+        } catch (IllegalStateException e) {
+            // Lỗi nghiệp vụ: không được xóa chủ hộ
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(e.getMessage()));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build();
+            // Không tìm thấy
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            // Lỗi khác
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Lỗi hệ thống: " + e.getMessage()));
         }
     }
 

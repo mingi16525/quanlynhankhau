@@ -19,6 +19,9 @@ public class ThanhVienHoService {
     @Autowired
     private NhanKhauRepository nhanKhauRepository;
 
+    @Autowired
+    private GhiNhanThayDoiHoKhauService ghiNhanThayDoiService;
+
     // Lấy thông tin thành viên (có thể cần cho logic khác)
     public Optional<ThanhVienHo> getThanhVienHoById(Integer id) {
         return thanhVienHoRepository.findById(id);
@@ -31,13 +34,26 @@ public class ThanhVienHoService {
     //@PreAuthorize("hasAuthority('HO_KHAU:UPDATE')")
     public ThanhVienHo addThanhVien(ThanhVienHo tvh) {
         
-        NhanKhau nhanKhau = tvh.getNhanKhau();
+        Integer hoKhauId = tvh.getHoKhau().getId();
+        Integer nhanKhauId = tvh.getNhanKhau().getId();
         
-        // --- LOGIC NGHIỆP VỤ: KIỂM TRA CHƯA LÀ THÀNH VIÊN ---
-        // Một người không thể là thành viên chính thức của nhiều hộ khẩu cùng lúc.
-        if (thanhVienHoRepository.findByNhanKhau_Id(nhanKhau.getId()).isPresent()) {
-            throw new IllegalStateException("Nhân khẩu ID: " + nhanKhau.getId() + " đã là thành viên của hộ khẩu khác.");
+        // --- LOGIC NGHIỆP VỤ 1: KIỂM TRA TRÙNG LẶP TRONG CÙNG HỘ KHẨU ---
+        if (thanhVienHoRepository.existsByHoKhau_IdAndNhanKhau_Id(hoKhauId, nhanKhauId)) {
+            throw new IllegalStateException("Nhân khẩu này đã là thành viên của hộ khẩu này rồi!");
         }
+        
+        // --- LOGIC NGHIỆP VỤ 2: KIỂM TRA ĐÃ LÀ THÀNH VIÊN CỦA HỘ KHÁC ---
+        // Một người không thể là thành viên chính thức của nhiều hộ khẩu cùng lúc.
+        Optional<ThanhVienHo> existingMembership = thanhVienHoRepository.findByNhanKhau_Id(nhanKhauId);
+        if (existingMembership.isPresent()) {
+            ThanhVienHo existing = existingMembership.get();
+            throw new IllegalStateException("Nhân khẩu này đã là thành viên của hộ khẩu khác (Mã số: " + 
+                existing.getHoKhau().getMaSoHo() + ").");
+        }
+        
+        // Fetch đầy đủ thông tin nhân khẩu từ database
+        NhanKhau nhanKhau = nhanKhauRepository.findById(nhanKhauId)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhân khẩu với ID: " + nhanKhauId));
         
         // 1. Lưu thông tin thành viên hộ khẩu mới
         ThanhVienHo savedTvh = thanhVienHoRepository.save(tvh);
@@ -45,6 +61,9 @@ public class ThanhVienHoService {
         // 2. Cập nhật trạng thái của Nhân khẩu thành 'Thường trú'
         nhanKhau.setTinhTrang("Thường trú");
         nhanKhauRepository.save(nhanKhau);
+        
+        // 3. Ghi nhận thay đổi
+        ghiNhanThayDoiService.ghiNhanThemThanhVien(tvh.getHoKhau(), nhanKhau.getHoTen());
 
         return savedTvh;
     }
@@ -63,17 +82,30 @@ public class ThanhVienHoService {
         }
 
         ThanhVienHo tvh = optionalTvh.get();
-        NhanKhau nhanKhau = tvh.getNhanKhau();
+        Integer nhanKhauId = tvh.getNhanKhau().getId();
+        Integer chuHoId = tvh.getHoKhau().getChuHo().getId();
+        
+        // Kiểm tra không được xóa Chủ hộ
+        if (nhanKhauId.equals(chuHoId)) {
+            throw new IllegalStateException("Không thể xóa Chủ hộ! Vui lòng chuyển quyền Chủ hộ trước.");
+        }
+        
+        // Fetch đầy đủ thông tin nhân khẩu từ database
+        NhanKhau nhanKhau = nhanKhauRepository.findById(nhanKhauId)
+            .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy nhân khẩu với ID: " + nhanKhauId));
 
+        // Lưu tên để ghi log (trước khi xóa)
+        String tenNhanKhau = nhanKhau.getHoTen();
+        
         // 1. Xóa bản ghi thành viên khỏi bảng liên kết
         thanhVienHoRepository.delete(tvh);
 
         // 2. Cập nhật trạng thái của Nhân khẩu
-        // [LOGIC]: Trạng thái sẽ được chuyển thành 'Không xác định' hoặc 'Đã chuyển đi'
-        if (nhanKhau != null) {
-            nhanKhau.setTinhTrang("Đã chuyển đi"); // Hoặc một trạng thái khác phù hợp
-            nhanKhauRepository.save(nhanKhau);
-        }
+        nhanKhau.setTinhTrang("Đã chuyển đi");
+        nhanKhauRepository.save(nhanKhau);
+        
+        // 3. Ghi nhận thay đổi
+        ghiNhanThayDoiService.ghiNhanXoaThanhVien(tvh.getHoKhau(), tenNhanKhau);
     }
 
     /**

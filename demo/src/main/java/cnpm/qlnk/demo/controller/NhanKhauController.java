@@ -154,4 +154,15 @@ public class NhanKhauController {
         
         return ResponseEntity.ok(results);
     }
+    
+    // GET /api/nhankhau/available - Lấy nhân khẩu chưa thuộc hộ khẩu nào
+    @GetMapping("/available")
+    public ResponseEntity<List<NhanKhau>> getAvailableNhanKhau() {
+        System.out.println("=== GET AVAILABLE NHAN KHAU (Not in any HoKhau) ===");
+        
+        List<NhanKhau> results = nhanKhauService.getNhanKhauNotInAnyHoKhau();
+        System.out.println("Found " + results.size() + " available records");
+        
+        return ResponseEntity.ok(results);
+    }
 }

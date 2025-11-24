@@ -19,7 +19,7 @@ import {
   EditOutlined,
   CopyOutlined
 } from '@ant-design/icons';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import apiClient from '../../api/apiClient';
 import dayjs from 'dayjs';
 
@@ -28,10 +28,14 @@ const { Option } = Select;
 
 const NhanKhauFormPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { mode, id } = useParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Lấy returnTo từ location.state (nếu có)
+  const returnTo = location.state?.returnTo || '/dashboard/nhankhau';
 
   // Xác định chế độ
   const isViewMode = mode === 'view';
@@ -50,6 +54,15 @@ const NhanKhauFormPage = () => {
   useEffect(() => {
     if (id && (isViewMode || isEditMode || isCloneMode)) {
       fetchNhanKhau();
+    } else if (isNewMode && location.state?.ngaySinh) {
+      // Pre-fill ngày sinh nếu đến từ sự kiện sinh
+      // location.state.ngaySinh là string YYYY-MM-DD, cần convert sang dayjs
+      const ngaySinhValue = dayjs(location.state.ngaySinh);
+      
+      form.setFieldsValue({
+        ngaySinh: ngaySinhValue
+      });
+      console.log('✅ Pre-filled ngày sinh from event:', ngaySinhValue.format('DD/MM/YYYY'));
     }
   }, [id, mode]);
 
@@ -105,7 +118,8 @@ const NhanKhauFormPage = () => {
         message.success(isCloneMode ? '✅ Sao chép thành công' : '✅ Thêm mới thành công');
       }
 
-      navigate('/dashboard/nhankhau');
+      // Quay về trang trước đó (hoặc trang danh sách mặc định)
+      navigate(returnTo);
     } catch (error) {
       console.error('❌ Error submitting:', error);
       message.error(error.response?.data?.message || 'Có lỗi xảy ra');
@@ -115,7 +129,8 @@ const NhanKhauFormPage = () => {
   };
 
   const handleCancel = () => {
-    navigate('/dashboard/nhankhau');
+    // Quay về trang trước đó (hoặc trang danh sách mặc định)
+    navigate(returnTo);
   };
 
   const handleEdit = () => {

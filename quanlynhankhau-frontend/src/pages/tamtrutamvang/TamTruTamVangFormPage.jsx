@@ -34,6 +34,8 @@ const TamTruTamVangFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [allNhanKhau, setAllNhanKhau] = useState([]);
+  const [filteredNhanKhau, setFilteredNhanKhau] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
   const [selectedLoai, setSelectedLoai] = useState('Tạm trú'); // ✅ Set giá trị mặc định
 
   const isEditMode = !!id;
@@ -55,10 +57,31 @@ const TamTruTamVangFormPage = () => {
     try {
       const response = await apiClient.get('/nhankhau');
       setAllNhanKhau(response.data);
+      setFilteredNhanKhau(response.data);
     } catch (error) {
       console.error('❌ Error fetching nhân khẩu:', error);
       message.error('Không thể tải danh sách nhân khẩu');
     }
+  };
+
+  const handleSearch = (value) => {
+    if (searchTimeout) clearTimeout(searchTimeout);
+    
+    if (!value || value.trim() === '') {
+      setFilteredNhanKhau(allNhanKhau);
+      return;
+    }
+    
+    const timeout = setTimeout(() => {
+      const searchValue = value.toLowerCase();
+      const filtered = allNhanKhau.filter(nk => 
+        nk.hoTen.toLowerCase().includes(searchValue) ||
+        nk.soCCCD.includes(searchValue)
+      );
+      setFilteredNhanKhau(filtered);
+    }, 300);
+    
+    setSearchTimeout(timeout);
   };
 
   const fetchRecord = async () => {
@@ -207,12 +230,11 @@ const TamTruTamVangFormPage = () => {
                   showSearch
                   placeholder="Tìm kiếm theo tên hoặc CCCD"
                   size="large"
-                  optionFilterProp="children"
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                  }
+                  filterOption={false}
+                  onSearch={handleSearch}
+                  notFoundContent={filteredNhanKhau.length === 0 ? 'Không tìm thấy kết quả' : null}
                 >
-                  {allNhanKhau.map(nk => (
+                  {filteredNhanKhau.map(nk => (
                     <Option key={nk.id} value={nk.id}>
                       <UserOutlined /> {nk.hoTen} - CCCD: {nk.soCCCD}
                     </Option>

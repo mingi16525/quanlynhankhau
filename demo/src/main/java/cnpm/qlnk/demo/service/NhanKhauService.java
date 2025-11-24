@@ -120,4 +120,9 @@ public class NhanKhauService {
     public List<NhanKhau> searchNhanKhau(String keyword) {
         return nhanKhauRepository.findByHoTenContainingOrSoCCCDContaining(keyword, keyword);
     }
+    
+    // Lấy danh sách nhân khẩu chưa thuộc hộ khẩu nào
+    public List<NhanKhau> getNhanKhauNotInAnyHoKhau() {
+        return nhanKhauRepository.findNhanKhauNotInAnyHoKhau();
+    }
 }

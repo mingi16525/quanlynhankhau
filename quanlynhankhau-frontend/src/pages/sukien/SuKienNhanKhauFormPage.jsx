@@ -36,7 +36,9 @@ const SuKienNhanKhauFormPage = () => {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [allNhanKhau, setAllNhanKhau] = useState([]);
+  const [filteredNhanKhau, setFilteredNhanKhau] = useState([]);
   const [loaiSuKien, setLoaiSuKien] = useState('Sinh');
+  const [searchTimeout, setSearchTimeout] = useState(null);
 
   const isEditMode = !!id;
 
@@ -57,10 +59,35 @@ const SuKienNhanKhauFormPage = () => {
     try {
       const response = await apiClient.get('/nhankhau');
       setAllNhanKhau(response.data);
+      setFilteredNhanKhau(response.data.filter(nk => nk.tinhTrang !== 'Đã mất'));
     } catch (error) {
       console.error('❌ Error fetching nhân khẩu:', error);
       message.error('Không thể tải danh sách nhân khẩu');
     }
+  };
+
+  const handleSearch = (value) => {
+    // Clear timeout cũ
+    if (searchTimeout) clearTimeout(searchTimeout);
+    
+    // Nếu input rỗng, hiển thị tất cả
+    if (!value || value.trim() === '') {
+      setFilteredNhanKhau(allNhanKhau.filter(nk => nk.tinhTrang !== 'Đã mất'));
+      return;
+    }
+    
+    // Set timeout mới - chỉ search sau 300ms người dùng dừng gõ
+    const timeout = setTimeout(() => {
+      const searchValue = value.toLowerCase();
+      const filtered = allNhanKhau.filter(nk => {
+        if (nk.tinhTrang === 'Đã mất') return false;
+        return nk.hoTen.toLowerCase().includes(searchValue) ||
+               nk.soCCCD.includes(searchValue);
+      });
+      setFilteredNhanKhau(filtered);
+    }, 300);
+    
+    setSearchTimeout(timeout);
   };
 
   const fetchRecord = async () => {
@@ -111,13 +138,26 @@ const SuKienNhanKhauFormPage = () => {
       if (isEditMode) {
         response = await apiClient.put(`/sukien/${id}`, payload);
         message.success('✅ Cập nhật thành công');
+        navigate('/dashboard/sukien');
       } else {
         response = await apiClient.post('/sukien', payload);
         message.success('✅ Ghi nhận sự kiện thành công');
+        
+        // Nếu là sự kiện SINH, chuyển đến trang thêm nhân khẩu mới
+        if (values.loaiSuKien === 'Sinh') {
+          console.log('🔄 Redirecting to add NhanKhau form...');
+          navigate('/dashboard/nhankhau/form/new', {
+            state: { 
+              ngaySinh: values.ngayGhiNhan.format('YYYY-MM-DD'), // Truyền string thay vì dayjs object
+              returnTo: '/dashboard/sukien'
+            }
+          });
+        } else {
+          navigate('/dashboard/sukien');
+        }
       }
 
       console.log('✅ Response:', response.data);
-      navigate('/dashboard/sukien');
 
     } catch (error) {
       console.error('❌ Error submitting:', error);
@@ -235,14 +275,11 @@ const SuKienNhanKhauFormPage = () => {
                 showSearch
                 placeholder="Tìm kiếm theo tên hoặc CCCD"
                 size="large"
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                }
+                filterOption={false}
+                onSearch={handleSearch}
+                notFoundContent={filteredNhanKhau.length === 0 ? 'Không tìm thấy kết quả' : null}
               >
-                {allNhanKhau
-                  .filter(nk => nk.tinhTrang !== 'Đã mất')
-                  .map(nk => (
+                {filteredNhanKhau.map(nk => (
                     <Option key={nk.id} value={nk.id}>
                       <Space>
                         <UserOutlined />
