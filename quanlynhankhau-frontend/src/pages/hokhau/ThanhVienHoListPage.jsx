@@ -173,6 +173,36 @@ const ThanhVienHoListPage = () => {
         }
     };
 
+    // ========== TÌM KIẾM NHÂN KHẨU ==========
+    const [searchNhanKhauList, setSearchNhanKhauList] = useState([]);
+    const [searchingNhanKhau, setSearchingNhanKhau] = useState(false);
+
+    const handleSearchNhanKhau = async (searchText) => {
+        if (!searchText || searchText.length < 2) {
+            setSearchNhanKhauList([]);
+            return;
+        }
+
+        setSearchingNhanKhau(true);
+        try {
+            // Gọi API tìm kiếm nhân khẩu theo họ tên hoặc CCCD
+            const response = await apiClient.get('/nhankhau/search', {
+                params: { keyword: searchText }
+            });
+            
+            // Lọc bỏ những người đã có trong hộ khẩu
+            const currentMemberIds = thanhVienList.map(tv => tv.nhanKhau?.id);
+            const filtered = response.data.filter(nk => !currentMemberIds.includes(nk.id));
+            
+            setSearchNhanKhauList(filtered);
+        } catch (error) {
+            console.error('❌ Error searching nhan khau:', error);
+            message.error('Lỗi khi tìm kiếm nhân khẩu');
+        } finally {
+            setSearchingNhanKhau(false);
+        }
+    };
+
     // ========== THÊM THÀNH VIÊN ==========
     const handleAddMember = async (values) => {
         const { nhanKhauId, quanHe } = values;
@@ -199,6 +229,7 @@ const ThanhVienHoListPage = () => {
             message.success('✅ Thêm thành viên thành công!');
             setIsAddMemberModalVisible(false);
             addMemberForm.resetFields();
+            setSearchNhanKhauList([]); // Reset search results
             fetchData();
 
         } catch (error) {
@@ -795,12 +826,14 @@ const ThanhVienHoListPage = () => {
                 onCancel={() => {
                     setIsAddMemberModalVisible(false);
                     addMemberForm.resetFields();
+                    setSearchNhanKhauList([]);
                 }}
                 footer={null}
                 width={600}
             >
                 <Alert 
-                    message="Chọn nhân khẩu và quan hệ với Chủ hộ" 
+                    message="Tìm kiếm và chọn nhân khẩu muốn thêm vào hộ" 
+                    description="Nhập họ tên hoặc CCCD để tìm kiếm (tối thiểu 2 ký tự)"
                     type="info" 
                     showIcon 
                     style={{ marginBottom: 20 }}
@@ -813,20 +846,45 @@ const ThanhVienHoListPage = () => {
                 >
                     <Form.Item
                         name="nhanKhauId"
-                        label="Chọn Nhân khẩu"
+                        label="Tìm kiếm Nhân khẩu"
                         rules={[{ required: true, message: 'Vui lòng chọn Nhân khẩu!' }]}
                     >
                         <Select 
                             showSearch 
-                            placeholder="Tìm kiếm nhân khẩu (Họ tên, CCCD)"
+                            placeholder="Nhập họ tên hoặc CCCD để tìm kiếm..."
                             optionFilterProp="children"
-                            filterOption={(input, option) =>
-                                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            filterOption={false}
+                            onSearch={handleSearchNhanKhau}
+                            loading={searchingNhanKhau}
+                            notFoundContent={
+                                searchingNhanKhau ? (
+                                    <div style={{ textAlign: 'center', padding: '20px' }}>
+                                        <Spin size="small" />
+                                        <div style={{ marginTop: '8px' }}>Đang tìm kiếm...</div>
+                                    </div>
+                                ) : searchNhanKhauList.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                                        Nhập tối thiểu 2 ký tự để tìm kiếm
+                                    </div>
+                                ) : null
                             }
                         >
-                            {availableNhanKhau.map(nk => (
+                            {searchNhanKhauList.map(nk => (
                                 <Option key={nk.id} value={nk.id}>
-                                    {nk.hoTen} (ID: {nk.id}, CCCD: {nk.soCCCD})
+                                    <Space direction="vertical" size={0} style={{ width: '100%' }}>
+                                        <Space>
+                                            {nk.gioiTinh === 'Nam' ? 
+                                                <ManOutlined style={{ color: '#1890ff' }} /> : 
+                                                <WomanOutlined style={{ color: '#ff4d4f' }} />
+                                            }
+                                            <strong>{nk.hoTen}</strong>
+                                            <Tag color="blue">ID: {nk.id}</Tag>
+                                        </Space>
+                                        <div style={{ fontSize: '12px', color: '#888' }}>
+                                            CCCD: {nk.soCCCD || 'N/A'} | 
+                                            Ngày sinh: {nk.ngaySinh ? new Date(nk.ngaySinh).toLocaleDateString('vi-VN') : 'N/A'}
+                                        </div>
+                                    </Space>
                                 </Option>
                             ))}
                         </Select>
@@ -860,6 +918,7 @@ const ThanhVienHoListPage = () => {
                             <Button onClick={() => {
                                 setIsAddMemberModalVisible(false);
                                 addMemberForm.resetFields();
+                                setSearchNhanKhauList([]);
                             }}>
                                 Hủy
                             </Button>
