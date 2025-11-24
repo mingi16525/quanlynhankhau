@@ -5,6 +5,7 @@ import cnpm.qlnk.demo.service.VaiTroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,14 @@ public class VaiTroController {
     private VaiTroService vaiTroService;
 
     // Lấy tất cả vai trò
+    @PreAuthorize("hasAuthority('VAI_TRO:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<VaiTro>> getAllVaiTro() {
         return ResponseEntity.ok(vaiTroService.getAllVaiTro());
     }
 
     // Lấy vai trò theo ID
+    @PreAuthorize("hasAuthority('VAI_TRO:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getVaiTroById(@PathVariable Integer id) {
         try {
@@ -37,6 +40,7 @@ public class VaiTroController {
     }
 
     // Tạo vai trò mới
+    @PreAuthorize("hasAuthority('VAI_TRO:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> createVaiTro(@RequestBody VaiTro vaiTro) {
         try {
@@ -52,6 +56,7 @@ public class VaiTroController {
     }
 
     // Cập nhật vai trò
+    @PreAuthorize("hasAuthority('VAI_TRO:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateVaiTro(@PathVariable Integer id, @RequestBody VaiTro vaiTro) {
         try {
@@ -67,6 +72,7 @@ public class VaiTroController {
     }
 
     // Xóa vai trò
+    @PreAuthorize("hasAuthority('VAI_TRO:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteVaiTro(@PathVariable Integer id) {
         try {

@@ -5,6 +5,7 @@ import cnpm.qlnk.demo.service.SuKienNhanKhauService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien
      * Lấy TẤT CẢ sự kiện
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<SuKienNhanKhau>> getAll(Authentication authentication) {
         System.out.println("=== GET ALL SU KIEN NHAN KHAU ===");
@@ -39,6 +41,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/{id}
      * Lấy chi tiết 1 sự kiện
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         System.out.println("=== GET SU KIEN BY ID: " + id + " ===");
@@ -59,6 +62,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/loai/sinh
      * Lấy danh sách sự kiện SINH
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/loai/sinh")
     public ResponseEntity<List<SuKienNhanKhau>> getSinhList() {
         System.out.println("=== GET SINH LIST ===");
@@ -73,6 +77,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/loai/mat
      * Lấy danh sách sự kiện MẤT
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/loai/mat")
     public ResponseEntity<List<SuKienNhanKhau>> getMatList() {
         System.out.println("=== GET MAT LIST ===");
@@ -87,6 +92,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/nhankhau/{nhanKhauId}
      * Lấy lịch sử sự kiện của 1 nhân khẩu
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/nhankhau/{nhanKhauId}")
     public ResponseEntity<List<SuKienNhanKhau>> getByNhanKhau(@PathVariable Integer nhanKhauId) {
         System.out.println("=== GET SU KIEN BY NHAN KHAU: " + nhanKhauId + " ===");
@@ -101,6 +107,7 @@ public class SuKienNhanKhauController {
      * POST /api/sukien
      * Ghi nhận sự kiện mới (SINH hoặc MẤT)
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody SuKienNhanKhau suKien) {
         System.out.println("=== CREATE SU KIEN NHAN KHAU ===");
@@ -135,6 +142,7 @@ public class SuKienNhanKhauController {
      * PUT /api/sukien/{id}
      * Cập nhật thông tin sự kiện
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
@@ -172,6 +180,7 @@ public class SuKienNhanKhauController {
      * DELETE /api/sukien/{id}
      * Xóa sự kiện
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         System.out.println("=== DELETE SU KIEN ID: " + id + " ===");
@@ -203,6 +212,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/search?keyword={keyword}
      * Tìm kiếm sự kiện
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<SuKienNhanKhau>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH SU KIEN: " + keyword + " ===");
@@ -217,6 +227,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/daterange?start={start}&end={end}
      * Lấy sự kiện trong khoảng thời gian
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/daterange")
     public ResponseEntity<List<SuKienNhanKhau>> getByDateRange(
             @RequestParam String start,
@@ -237,6 +248,7 @@ public class SuKienNhanKhauController {
      * GET /api/sukien/stats
      * Thống kê số lượng sự kiện Sinh/Mất
      */
+    @PreAuthorize("hasAuthority('SU_KIEN:READ') or hasAuthority('*:*')")
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Long>> getStats() {
         System.out.println("=== GET STATS ===");

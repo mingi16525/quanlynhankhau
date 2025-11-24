@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class HoatDongThienNguyenController {
      * GET /api/hoatdong
      * Lấy TẤT CẢ hoạt động
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<HoatDongThienNguyen>> getAll() {
         System.out.println("=== GET ALL HOAT DONG ===");
@@ -35,6 +37,7 @@ public class HoatDongThienNguyenController {
     /**
      * GET /api/hoatdong/{id}
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Integer id) {
         System.out.println("=== GET HOAT DONG BY ID: " + id + " ===");
@@ -48,6 +51,7 @@ public class HoatDongThienNguyenController {
     /**
      * GET /api/hoatdong/active
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/active")
     public ResponseEntity<List<HoatDongThienNguyen>> getActive() {
         System.out.println("=== GET ACTIVE HOAT DONG ===");
@@ -58,6 +62,7 @@ public class HoatDongThienNguyenController {
     /**
      * GET /api/hoatdong/trangthai/{trangThai}
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/trangthai/{trangThai}")
     public ResponseEntity<List<HoatDongThienNguyen>> getByTrangThai(@PathVariable String trangThai) {
         System.out.println("=== GET BY TRANG THAI: " + trangThai + " ===");
@@ -69,6 +74,7 @@ public class HoatDongThienNguyenController {
      * GET /api/hoatdong/{id}/thongke
      * Thống kê chi tiết của một hoạt động
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}/thongke")
     public ResponseEntity<Map<String, Object>> getThongKe(@PathVariable Integer id) {
         System.out.println("=== GET THONG KE - HOAT DONG: " + id + " ===");
@@ -86,6 +92,7 @@ public class HoatDongThienNguyenController {
     /**
      * POST /api/hoatdong
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody HoatDongThienNguyen hoatDong) {
         System.out.println("=== CREATE HOAT DONG ===");
@@ -109,6 +116,7 @@ public class HoatDongThienNguyenController {
     /**
      * PUT /api/hoatdong/{id}
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody HoatDongThienNguyen hoatDong) {
         System.out.println("=== UPDATE HOAT DONG ID: " + id + " ===");
@@ -137,6 +145,7 @@ public class HoatDongThienNguyenController {
     /**
      * DELETE /api/hoatdong/{id}
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         System.out.println("=== DELETE HOAT DONG ID: " + id + " ===");
@@ -161,6 +170,7 @@ public class HoatDongThienNguyenController {
     /**
      * GET /api/hoatdong/search?keyword={keyword}
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<HoatDongThienNguyen>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH HOAT DONG: " + keyword + " ===");
@@ -171,6 +181,7 @@ public class HoatDongThienNguyenController {
     /**
      * GET /api/hoatdong/daterange?start={start}&end={end}
      */
+    @PreAuthorize("hasAuthority('THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/daterange")
     public ResponseEntity<List<HoatDongThienNguyen>> getByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,

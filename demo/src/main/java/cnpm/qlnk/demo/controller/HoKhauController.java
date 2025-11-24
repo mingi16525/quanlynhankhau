@@ -6,6 +6,7 @@ import cnpm.qlnk.demo.dto.UpdateHoKhauRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,18 +19,21 @@ public class HoKhauController {
     private HoKhauService hoKhauService;
 
     // GET /api/hokhau
+    @PreAuthorize("hasAuthority('HO_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<HoKhau>> getAll() {
         return ResponseEntity.ok(hoKhauService.getAllHoKhau());
     }
     
     // GET /api/hokhau/{id}/thanhvien
+    @PreAuthorize("hasAuthority('HO_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}/thanhvien")
     public ResponseEntity<List<?>> getThanhVienByHoKhauId(@PathVariable Integer id) {
         return ResponseEntity.ok(hoKhauService.getThanhVienByHoKhauId(id));
     }
     
     // GET /api/hokhau/{id}
+    @PreAuthorize("hasAuthority('HO_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<HoKhau> getById(@PathVariable Integer id) {
         return hoKhauService.getHoKhauById(id)
@@ -38,6 +42,7 @@ public class HoKhauController {
     }
 
     // POST /api/hokhau: Tạo mới HoKhau
+    @PreAuthorize("hasAuthority('HO_KHAU:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<HoKhau> create(@RequestBody HoKhau hoKhau) {
         try {
@@ -53,6 +58,7 @@ public class HoKhauController {
     }
 
     // PUT /api/hokhau/{id}: Cập nhật HoKhau (bao gồm thay đổi Chủ hộ)
+    @PreAuthorize("hasAuthority('HO_KHAU:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<HoKhau> update(@PathVariable Integer id, @RequestBody UpdateHoKhauRequest request) {
         try {
@@ -68,6 +74,7 @@ public class HoKhauController {
     }
     
     // DELETE /api/hokhau/{id}: Xóa HoKhau
+    @PreAuthorize("hasAuthority('HO_KHAU:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Integer id) {
         try {
@@ -82,6 +89,7 @@ public class HoKhauController {
     }
 
     // POST /api/hokhau/{id}/tach: Tách hộ khẩu
+    @PreAuthorize("hasAuthority('HO_KHAU:CREATE') or hasAuthority('*:*')")
     @PostMapping("/{id}/tach")
     public ResponseEntity<?> tachHo(@PathVariable Integer id, @RequestBody TachHoRequest request) {
         try {

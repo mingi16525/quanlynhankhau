@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class ThuThienNguyenController {
     /**
      * GET /api/thuthiennguyen
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<ThuThienNguyen>> getAll() {
         System.out.println("=== GET ALL THU THIEN NGUYEN ===");
@@ -34,6 +36,7 @@ public class ThuThienNguyenController {
     /**
      * GET /api/thuthiennguyen/{id}
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Integer id) {
         System.out.println("=== GET THU BY ID: " + id + " ===");
@@ -47,6 +50,7 @@ public class ThuThienNguyenController {
     /**
      * GET /api/thuthiennguyen/hoatdong/{hoatDongId}
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/hoatdong/{hoatDongId}")
     public ResponseEntity<List<ThuThienNguyen>> getByHoatDong(@PathVariable Integer hoatDongId) {
         System.out.println("=== GET THU BY HOAT DONG: " + hoatDongId + " ===");
@@ -57,6 +61,7 @@ public class ThuThienNguyenController {
     /**
      * POST /api/thuthiennguyen
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody ThuThienNguyen thu) {
         System.out.println("=== CREATE THU THIEN NGUYEN ===");
@@ -81,6 +86,7 @@ public class ThuThienNguyenController {
     /**
      * PUT /api/thuthiennguyen/{id}
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody ThuThienNguyen thu) {
         System.out.println("=== UPDATE THU ID: " + id + " ===");
@@ -109,6 +115,7 @@ public class ThuThienNguyenController {
     /**
      * DELETE /api/thuthiennguyen/{id}
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         System.out.println("=== DELETE THU ID: " + id + " ===");
@@ -133,6 +140,7 @@ public class ThuThienNguyenController {
     /**
      * GET /api/thuthiennguyen/search?keyword={keyword}
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<ThuThienNguyen>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH THU: " + keyword + " ===");
@@ -143,6 +151,7 @@ public class ThuThienNguyenController {
     /**
      * GET /api/thuthiennguyen/daterange?start={start}&end={end}
      */
+    @PreAuthorize("hasAuthority('THU_THIEN_NGUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/daterange")
     public ResponseEntity<List<ThuThienNguyen>> getByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,

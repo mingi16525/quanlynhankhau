@@ -21,7 +21,7 @@ public class TaiKhoanController {
     private TaiKhoanService taiKhoanService;
 
     // GET /api/admin/taikhoan - Lấy tất cả tài khoản
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<TaiKhoan>> getAllTaiKhoan(Authentication authentication) {
         System.out.println("=== GET ALL TAIKHOAN ===");
@@ -35,8 +35,8 @@ public class TaiKhoanController {
     }  
 
     // GET /api/admin/taikhoan/{id} - Lấy chi tiết tài khoản
+    @PreAuthorize("hasAuthority('TAI_KHOAN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
     public ResponseEntity<?> getTaiKhoanById(@PathVariable Integer id) {
         try {
             TaiKhoan taiKhoan = taiKhoanService.getTaiKhoanById(id);
@@ -48,8 +48,8 @@ public class TaiKhoanController {
     }
 
     // POST /api/admin/taikhoan/{tenVaiTro} - Tạo tài khoản mới
+    @PreAuthorize("hasAuthority('TAI_KHOAN:CREATE') or hasAuthority('*:*')")
     @PostMapping("/{tenVaiTro}")
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
     public ResponseEntity<?> createTaiKhoan(
             @RequestBody TaiKhoan taiKhoan, 
             @PathVariable String tenVaiTro) {
@@ -66,8 +66,8 @@ public class TaiKhoanController {
     }
 
     // PUT /api/admin/taikhoan/{id} - Cập nhật tài khoản
+    @PreAuthorize("hasAuthority('TAI_KHOAN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
     public ResponseEntity<?> updateTaiKhoan(
             @PathVariable Integer id,
             @RequestBody TaiKhoan taiKhoan,
@@ -85,8 +85,8 @@ public class TaiKhoanController {
     }
 
     // PUT /api/admin/taikhoan/{id}/lock - Khóa/mở khóa tài khoản
+    @PreAuthorize("hasAuthority('TAI_KHOAN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}/lock")
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
     public ResponseEntity<?> toggleLock(@PathVariable Integer id) {
         try {
             taiKhoanService.lockTaiKhoan(id);
@@ -98,8 +98,8 @@ public class TaiKhoanController {
     }
 
     // PUT /api/admin/taikhoan/{id}/reset-password - Reset mật khẩu
+    @PreAuthorize("hasAuthority('TAI_KHOAN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}/reset-password")
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
     public ResponseEntity<?> resetPassword(
             @PathVariable Integer id,
             @RequestBody Map<String, String> request) {
@@ -118,8 +118,8 @@ public class TaiKhoanController {
     }
 
     // DELETE /api/admin/taikhoan/{id} - Xóa tài khoản
+    @PreAuthorize("hasAuthority('TAI_KHOAN:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
-    // @PreAuthorize("hasAuthority('*:*') or hasRole('ADMIN_HE_THONG')")
     public ResponseEntity<?> deleteTaiKhoan(@PathVariable Integer id) {
         try {
             taiKhoanService.deleteTaiKhoan(id);

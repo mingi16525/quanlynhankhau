@@ -5,6 +5,7 @@ import cnpm.qlnk.demo.service.NhanKhauService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class NhanKhauController {
     private NhanKhauService nhanKhauService;
 
     // GET /api/nhankhau - Lấy tất cả hồ sơ nhân khẩu
+    @PreAuthorize("hasAuthority('NHAN_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<NhanKhau>> getAllNhanKhau(Authentication authentication) {
         System.out.println("=== GET ALL NHAN KHAU ===");
@@ -32,6 +34,7 @@ public class NhanKhauController {
     }
 
     // GET /api/nhankhau/{id} - Lấy hồ sơ chi tiết theo ID
+    @PreAuthorize("hasAuthority('NHAN_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getNhanKhauById(@PathVariable Integer id) {
         System.out.println("=== GET NHAN KHAU BY ID: " + id + " ===");
@@ -52,6 +55,7 @@ public class NhanKhauController {
         <Route path="nhankhau/form/new" element={<NhanKhauFormPage />} />
         <Route path="nhankhau/form/:mode/:id" element={<NhanKhauFormPage />} /> */
     //Tạo mới hồ sơ nhân khẩu POST /api/nhankhau 
+    @PreAuthorize("hasAuthority('NHAN_KHAU:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> createNhanKhau(@RequestBody NhanKhau nhanKhau) {
         System.out.println("=== CREATE NHAN KHAU ===");
@@ -77,6 +81,7 @@ public class NhanKhauController {
     }
 
     // PUT /api/nhankhau/{id} - Cập nhật hồ sơ nhân khẩu
+    @PreAuthorize("hasAuthority('NHAN_KHAU:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNhanKhau(
             @PathVariable Integer id, 
@@ -112,6 +117,7 @@ public class NhanKhauController {
     }
 
     // DELETE /api/nhankhau/{id} - Xóa hồ sơ nhân khẩu
+    @PreAuthorize("hasAuthority('NHAN_KHAU:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNhanKhau(@PathVariable Integer id) {
         System.out.println("=== DELETE NHAN KHAU ID: " + id + " ===");
@@ -145,6 +151,7 @@ public class NhanKhauController {
     }
 
     // GET /api/nhankhau/search?keyword={keyword} - Tìm kiếm nhân khẩu
+    @PreAuthorize("hasAuthority('NHAN_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<NhanKhau>> searchNhanKhau(@RequestParam String keyword) {
         System.out.println("=== SEARCH NHAN KHAU: " + keyword + " ===");
@@ -156,6 +163,7 @@ public class NhanKhauController {
     }
     
     // GET /api/nhankhau/available - Lấy nhân khẩu chưa thuộc hộ khẩu nào
+    @PreAuthorize("hasAuthority('NHAN_KHAU:READ') or hasAuthority('*:*')")
     @GetMapping("/available")
     public ResponseEntity<List<NhanKhau>> getAvailableNhanKhau() {
         System.out.println("=== GET AVAILABLE NHAN KHAU (Not in any HoKhau) ===");

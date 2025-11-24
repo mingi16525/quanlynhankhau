@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class TamTruTamVangController {
      * GET /api/tamtrutamvang
      * Lấy TẤT CẢ đăng ký
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<TamTruTamVang>> getAll(Authentication authentication) {
         System.out.println("=== GET ALL TAM TRU TAM VANG ===");
@@ -40,6 +42,7 @@ public class TamTruTamVangController {
      * GET /api/tamtrutamvang/{id}
      * Lấy chi tiết 1 đăng ký
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         System.out.println("=== GET TAM TRU TAM VANG BY ID: " + id + " ===");
@@ -63,6 +66,7 @@ public class TamTruTamVangController {
      * @param tuNgay Ngày bắt đầu đăng ký (optional)
      * @param denNgay Ngày kết thúc đăng ký (optional)
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/loai/tamtru")
     public ResponseEntity<List<TamTruTamVang>> getTamTruList(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
@@ -84,6 +88,7 @@ public class TamTruTamVangController {
      * @param tuNgay Ngày bắt đầu đăng ký (optional)
      * @param denNgay Ngày kết thúc đăng ký (optional)
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/loai/tamvang")
     public ResponseEntity<List<TamTruTamVang>> getTamVangList(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
@@ -102,6 +107,7 @@ public class TamTruTamVangController {
      * GET /api/tamtrutamvang/nhankhau/{nhanKhauId}
      * Lấy lịch sử tạm trú/tạm vắng của 1 nhân khẩu
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/nhankhau/{nhanKhauId}")
     public ResponseEntity<List<TamTruTamVang>> getByNhanKhau(@PathVariable Integer nhanKhauId) {
         System.out.println("=== GET TAM TRU TAM VANG BY NHAN KHAU: " + nhanKhauId + " ===");
@@ -116,6 +122,7 @@ public class TamTruTamVangController {
      * POST /api/tamtrutamvang
      * Đăng ký TẠM TRÚ hoặc TẠM VẮNG
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody TamTruTamVang tamTruTamVang) {
         System.out.println("=== CREATE TAM TRU TAM VANG ===");
@@ -150,6 +157,7 @@ public class TamTruTamVangController {
      * PUT /api/tamtrutamvang/{id}
      * Cập nhật thông tin đăng ký
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
@@ -187,6 +195,7 @@ public class TamTruTamVangController {
      * DELETE /api/tamtrutamvang/{id}
      * Hủy đăng ký
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         System.out.println("=== DELETE TAM TRU TAM VANG ID: " + id + " ===");
@@ -218,6 +227,7 @@ public class TamTruTamVangController {
      * GET /api/tamtrutamvang/search?keyword={keyword}
      * Tìm kiếm
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<TamTruTamVang>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH TAM TRU TAM VANG: " + keyword + " ===");
@@ -232,6 +242,7 @@ public class TamTruTamVangController {
      * GET /api/tamtrutamvang/hethan
      * Lấy danh sách sắp hết hạn (30 ngày)
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/hethan")
     public ResponseEntity<List<TamTruTamVang>> getSapHetHan() {
         System.out.println("=== GET SAP HET HAN ===");
@@ -246,6 +257,7 @@ public class TamTruTamVangController {
      * GET /api/tamtrutamvang/active
      * Lấy danh sách còn hiệu lực
      */
+    @PreAuthorize("hasAuthority('TAM_TRU_VANG:READ') or hasAuthority('*:*')")
     @GetMapping("/active")
     public ResponseEntity<List<TamTruTamVang>> getActive() {
         System.out.println("=== GET ACTIVE ===");

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi
      * Lấy TẤT CẢ lịch sử thay đổi
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<GhiNhanThayDoiHoKhau>> getAll(Authentication authentication) {
         System.out.println("=== GET ALL GHI NHAN THAY DOI HO KHAU ===");
@@ -40,6 +42,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi/{id}
      * Lấy chi tiết 1 bản ghi
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         System.out.println("=== GET GHI NHAN BY ID: " + id + " ===");
@@ -60,6 +63,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi/hokhau/{hoKhauId}
      * Lấy lịch sử thay đổi của một hộ khẩu
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping("/hokhau/{hoKhauId}")
     public ResponseEntity<List<GhiNhanThayDoiHoKhau>> getByHoKhau(@PathVariable Integer hoKhauId) {
         System.out.println("=== GET GHI NHAN BY HO KHAU: " + hoKhauId + " ===");
@@ -74,6 +78,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi/sukien/{tenSuKien}
      * Lấy theo loại sự kiện
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping("/sukien/{tenSuKien}")
     public ResponseEntity<List<GhiNhanThayDoiHoKhau>> getByTenSuKien(@PathVariable String tenSuKien) {
         System.out.println("=== GET GHI NHAN BY TEN SU KIEN: " + tenSuKien + " ===");
@@ -88,6 +93,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi/nguoithuchien/{username}
      * Lấy theo người thực hiện
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping("/nguoithuchien/{username}")
     public ResponseEntity<List<GhiNhanThayDoiHoKhau>> getByNguoiThucHien(@PathVariable String username) {
         System.out.println("=== GET GHI NHAN BY NGUOI THUC HIEN: " + username + " ===");
@@ -102,6 +108,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi/search?keyword={keyword}
      * Tìm kiếm trong mô tả và tên sự kiện
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<GhiNhanThayDoiHoKhau>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH GHI NHAN: " + keyword + " ===");
@@ -116,6 +123,7 @@ public class GhiNhanThayDoiHoKhauController {
      * GET /api/ghinhanthaydoi/daterange?start={start}&end={end}
      * Lấy theo khoảng thời gian
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @GetMapping("/daterange")
     public ResponseEntity<List<GhiNhanThayDoiHoKhau>> getByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
@@ -133,6 +141,7 @@ public class GhiNhanThayDoiHoKhauController {
      * DELETE /api/ghinhanthaydoi/{id}
      * Xóa bản ghi
      */
+    @PreAuthorize("hasAuthority('GHI_NHAN:READ') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         System.out.println("=== DELETE GHI NHAN ID: " + id + " ===");

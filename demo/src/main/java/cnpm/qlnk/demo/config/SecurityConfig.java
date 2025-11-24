@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
-//@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     @Autowired
@@ -47,8 +47,12 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> {
                 System.out.println("Configuring authorization...");
                 auth
+                    // Public endpoints
                     .requestMatchers("/api/auth/**").permitAll()
-                    .anyRequest().permitAll(); // TẠM THỜI CHO PHÉP TẤT CẢ
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
+                    .requestMatchers("/actuator/**").permitAll()
+                    // All other endpoints require authentication
+                    .anyRequest().authenticated();
             })
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

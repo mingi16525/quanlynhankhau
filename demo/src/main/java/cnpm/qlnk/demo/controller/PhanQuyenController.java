@@ -5,6 +5,7 @@ import cnpm.qlnk.demo.service.PhanQuyenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,12 +20,14 @@ public class PhanQuyenController {
     private PhanQuyenService phanQuyenService;
 
     // Lấy tất cả phân quyền
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<PhanQuyen>> getAllPhanQuyen() {
         return ResponseEntity.ok(phanQuyenService.getAllPhanQuyen());
     }
 
     // Lấy phân quyền theo ID
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getPhanQuyenById(@PathVariable Integer id) {
         try {
@@ -37,6 +40,7 @@ public class PhanQuyenController {
     }
 
     // Lấy phân quyền theo vai trò
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:READ') or hasAuthority('*:*')")
     @GetMapping("/vaitro/{vaiTroId}")
     public ResponseEntity<?> getPhanQuyenByVaiTro(@PathVariable Integer vaiTroId) {
         try {
@@ -49,6 +53,7 @@ public class PhanQuyenController {
     }
 
     // Thêm phân quyền mới
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> createPhanQuyen(@RequestBody PhanQuyen phanQuyen) {
         try {
@@ -64,6 +69,7 @@ public class PhanQuyenController {
     }
 
     // Thêm nhiều phân quyền cùng lúc
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:CREATE') or hasAuthority('*:*')")
     @PostMapping("/bulk/{vaiTroId}")
     public ResponseEntity<?> createBulkPhanQuyen(
             @PathVariable Integer vaiTroId,
@@ -78,6 +84,7 @@ public class PhanQuyenController {
     }
 
     // Cập nhật phân quyền
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePhanQuyen(@PathVariable Integer id, @RequestBody PhanQuyen phanQuyen) {
         try {
@@ -93,6 +100,7 @@ public class PhanQuyenController {
     }
 
     // Xóa phân quyền
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePhanQuyen(@PathVariable Integer id) {
         try {
@@ -108,6 +116,7 @@ public class PhanQuyenController {
     }
 
     // Xóa tất cả phân quyền của một vai trò
+    @PreAuthorize("hasAuthority('PHAN_QUYEN:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/vaitro/{vaiTroId}")
     public ResponseEntity<?> deleteAllByVaiTro(@PathVariable Integer vaiTroId) {
         try {

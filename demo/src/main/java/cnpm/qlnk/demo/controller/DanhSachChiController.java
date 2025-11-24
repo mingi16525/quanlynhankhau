@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -26,6 +27,7 @@ public class DanhSachChiController {
      * GET /api/chi
      * Lấy TẤT CẢ danh sách chi
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<DanhSachChi>> getAll() {
         System.out.println("=== GET ALL DANH SACH CHI ===");
@@ -38,6 +40,7 @@ public class DanhSachChiController {
      * GET /api/chi/{id}
      * Lấy chi tiết 1 khoản chi
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         System.out.println("=== GET CHI BY ID: " + id + " ===");
@@ -58,6 +61,7 @@ public class DanhSachChiController {
      * GET /api/chi/loai/{loaiChi}
      * Lấy danh sách chi theo loại
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/loai/{loaiChi}")
     public ResponseEntity<List<DanhSachChi>> getByLoai(@PathVariable String loaiChi) {
         System.out.println("=== GET CHI BY LOAI: " + loaiChi + " ===");
@@ -70,6 +74,7 @@ public class DanhSachChiController {
      * POST /api/chi
      * Tạo khoản chi mới
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody DanhSachChi chi) {
         System.out.println("=== CREATE DANH SACH CHI ===");
@@ -100,6 +105,7 @@ public class DanhSachChiController {
      * PUT /api/chi/{id}
      * Cập nhật khoản chi
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
@@ -137,6 +143,7 @@ public class DanhSachChiController {
      * DELETE /api/chi/{id}
      * Xóa khoản chi
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         System.out.println("=== DELETE CHI ID: " + id + " ===");
@@ -168,6 +175,7 @@ public class DanhSachChiController {
      * GET /api/chi/search?keyword={keyword}
      * Tìm kiếm khoản chi theo nội dung
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<DanhSachChi>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH CHI: " + keyword + " ===");
@@ -182,6 +190,7 @@ public class DanhSachChiController {
      * GET /api/chi/daterange?start={start}&end={end}
      * Lấy danh sách chi trong khoảng thời gian
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/daterange")
     public ResponseEntity<List<DanhSachChi>> getByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
@@ -198,6 +207,7 @@ public class DanhSachChiController {
      * GET /api/chi/thongke
      * Thống kê tổng chi
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/thongke")
     public ResponseEntity<Map<String, Object>> getThongKe() {
         System.out.println("=== GET THONG KE CHI ===");
@@ -231,6 +241,7 @@ public class DanhSachChiController {
      * GET /api/chi/thongke/loai/{loaiChi}
      * Tính tổng chi theo loại
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/thongke/loai/{loaiChi}")
     public ResponseEntity<Map<String, Object>> getTotalByLoai(@PathVariable String loaiChi) {
         System.out.println("=== GET TOTAL CHI BY LOAI: " + loaiChi + " ===");
@@ -251,6 +262,7 @@ public class DanhSachChiController {
      * GET /api/chi/thongke/daterange?start={start}&end={end}
      * Tính tổng chi trong khoảng thời gian
      */
+    @PreAuthorize("hasAuthority('CHI_PHI:READ') or hasAuthority('*:*')")
     @GetMapping("/thongke/daterange")
     public ResponseEntity<Map<String, Object>> getTotalByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,

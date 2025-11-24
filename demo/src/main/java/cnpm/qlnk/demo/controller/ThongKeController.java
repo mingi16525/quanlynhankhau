@@ -6,6 +6,7 @@ import cnpm.qlnk.demo.service.ThongKeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ public class ThongKeController {
      * @param denNgay Ngày kết thúc (optional)
      * @return ThongKeNhanKhauResponse
      */
+    @PreAuthorize("hasAuthority('THONG_KE:READ') or hasAuthority('*:*')")
     @GetMapping("/nhankhau")
     public ResponseEntity<ThongKeNhanKhauResponse> thongKeNhanKhau(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate tuNgay,
@@ -51,6 +53,7 @@ public class ThongKeController {
      * @param nhomTuoi MAM_NON, MAU_GIAO, CAP_1, CAP_2, CAP_3, LAO_DONG, NGHI_HUU
      * @return List<NhanKhau>
      */
+    @PreAuthorize("hasAuthority('THONG_KE:READ') or hasAuthority('*:*')")
     @GetMapping("/nhankhau/nhomtuoi/{nhomTuoi}")
     public ResponseEntity<List<NhanKhau>> getNhanKhauTheoDoTuoi(@PathVariable String nhomTuoi) {
         System.out.println("=== LẤY NHÂN KHẨU THEO NHÓM TUỔI: " + nhomTuoi + " ===");
