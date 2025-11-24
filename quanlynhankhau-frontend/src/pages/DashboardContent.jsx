@@ -56,11 +56,18 @@ const getDashboardItems = (role) => {
         { title: "Khoản Chi", icon: "WalletOutlined", path: "/dashboard/danhsachchi" },
         { title: "Thiện nguyện", icon: "HeartOutlined", path: "/dashboard/hoatdongthiennguyen" },
     ];
-} else if (role === 'LANH_DAO_PHUONG') {
+} else if (role === 'TO_TRUONG') {
+        // Tổ trưởng = Cán bộ NK + Kế toán
         return [
-            { title: "Báo cáo Tổng hợp", icon: "LineChartOutlined", path: "/dashboard/baocao" },
-            { title: "Danh sách Thu Chi", icon: "TableOutlined", path: "/dashboard/thuchi/danhsachchi" },
+            // Từ Cán bộ Nhân khẩu
             { title: "Hồ sơ Nhân khẩu", icon: "UserOutlined", path: "/dashboard/nhankhau" },
+            { title: "Quản lý Hộ khẩu", icon: "HomeOutlined", path: "/dashboard/hokhau" },
+            { title: "Đăng ký Tam trú tạm vắng", icon: "EnvironmentOutlined", path: "/dashboard/tamtrutamvang" },
+            { title: "Ghi nhận Sự kiện", icon: "CalendarOutlined", path: "/dashboard/sukien" },
+            // Từ Kế toán Thu chi
+            { title: "Khoản phí", icon: "WalletOutlined", path: "/dashboard/khoanphi" },
+            { title: "Khoản Chi", icon: "WalletOutlined", path: "/dashboard/danhsachchi" },
+            { title: "Thiện nguyện", icon: "HeartOutlined", path: "/dashboard/hoatdongthiennguyen" },
         ];
     }
     

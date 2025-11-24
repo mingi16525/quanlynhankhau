@@ -55,14 +55,22 @@ const MainLayout = () => {
                 { key: '/dashboard/danhsachchi', icon: <WalletOutlined />, label: 'Khoản Chi' },
                 { key: '/dashboard/hoatdongthiennguyen', icon: <WalletOutlined />, label: 'Thiện nguyện' },
             ];
-        } else if (role === 'LANH_DAO_PHUONG') {
+        } else if (role === 'TO_TRUONG') {
+            // Tổ trưởng = Cán bộ NK + Kế toán Thu chi
             return [
                 ...commonItems,
+                // Từ Cán bộ Nhân khẩu
+                { key: '/dashboard/nhankhau', icon: <UserOutlined />, label: 'Nhân khẩu' },
+                { key: '/dashboard/hokhau', icon: <TeamOutlined />, label: 'Hộ khẩu' },
+                { key: '/dashboard/tamtrutamvang', icon: <HomeOutlined />, label: 'Tam trú tạm vắng' },
+                { key: '/dashboard/sukien', icon: <BarChartOutlined />, label: 'Sự kiện' },
+                { key: '/dashboard/ghinhanthaydoi', icon: <BarChartOutlined />, label: 'Lịch sử HK' },
+                // Từ Kế toán Thu chi
+                { key: '/dashboard/khoanphi', icon: <WalletOutlined />, label: 'Khoản phí' },
+                { key: '/dashboard/baocao/thuphi', icon: <BarChartOutlined />, label: 'Báo cáo Thu phí' },
+                { key: '/dashboard/danhsachchi', icon: <WalletOutlined />, label: 'Khoản Chi' },
+                { key: '/dashboard/hoatdongthiennguyen', icon: <WalletOutlined />, label: 'Thiện nguyện' },
                 { key: '/dashboard/thongke', icon: <BarChartOutlined />, label: 'Thống kê' },
-                { key: '/dashboard/baocao', icon: <BarChartOutlined />, label: 'Báo cáo' },
-                { key: '/dashboard/baocao/thuphi', icon: <WalletOutlined />, label: 'Báo cáo Thu phí' },
-                { key: '/dashboard/thuchi/danhsachchi', icon: <WalletOutlined />, label: 'Thu Chi' },
-                { key: '/dashboard/nhankhau', icon: <UserOutlined />, label: 'Nhân khẩu (Xem)' },
             ];
         }
 
