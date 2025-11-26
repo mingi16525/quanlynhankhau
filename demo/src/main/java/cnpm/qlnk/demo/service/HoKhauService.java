@@ -4,7 +4,6 @@ package cnpm.qlnk.demo.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import cnpm.qlnk.demo.entity.HoKhau;
 import cnpm.qlnk.demo.entity.NhanKhau;
 import cnpm.qlnk.demo.entity.ThanhVienHo;
@@ -38,20 +37,17 @@ public class HoKhauService {
     private EntityManager entityManager;
     
     // 1. Lấy tất cả hộ khẩu
-    //@PreAuthorize("hasAuthority('HO_KHAU:READ')")
     public List<HoKhau> getAllHoKhau() {
         return hoKhauRepository.findAll();
     }
 
     // 2. Lấy hộ khẩu theo ID
-    //@PreAuthorize("hasAuthority('HO_KHAU:READ')")
     public Optional<HoKhau> getHoKhauById(Integer id) {
         return hoKhauRepository.findById(id);
     }
 
     // 3. Tạo mới hoặc Cập nhật hộ khẩu
     @Transactional
-    //@PreAuthorize("hasAuthority('HO_KHAU:CREATE') or hasAuthority('HO_KHAU:UPDATE')")
     public HoKhau saveHoKhau(HoKhau hoKhau) {
         // --- LOGIC NGHIỆP VỤ: KIỂM TRA MÃ SỐ HỘ DUY NHẤT ---
         if (hoKhau.getMaSoHo() != null && !hoKhau.getMaSoHo().isEmpty()) {
@@ -75,11 +71,11 @@ public class HoKhauService {
         NhanKhau chuHo = nhanKhauRepository.findById(chuHoInput.getId())
             .orElseThrow(() -> new IllegalArgumentException("Chủ hộ với ID " + chuHoInput.getId() + " không tồn tại!"));
         
-        // Lưu hộ khẩu
-        HoKhau savedHoKhau = hoKhauRepository.save(hoKhau);
+        // Kiểm tra xem đây là tạo mới hay cập nhật
+        boolean isNewHoKhau = (hoKhau.getId() == null);
         
-        // --- LOGIC TẠO MỚI: TỰ ĐỘNG THÊM CHỦ HỘ VÀO DANH SÁCH THÀNH VIÊN ---
-        if (hoKhau.getId() == null) { // Chỉ thực hiện khi TẠO MỚI hộ khẩu
+        // --- LOGIC TẠO MỚI: KIỂM TRA CHỦ HỘ CHƯA CÓ HỘ KHẨU ---
+        if (isNewHoKhau) { // Chỉ thực hiện khi TẠO MỚI hộ khẩu
             // Kiểm tra Chủ hộ đã là thành viên của hộ khẩu khác chưa
             Optional<ThanhVienHo> existingMembership = thanhVienHoRepository.findByNhanKhau_Id(chuHo.getId());
             if (existingMembership.isPresent()) {
@@ -87,22 +83,45 @@ public class HoKhauService {
                 throw new IllegalStateException("Chủ hộ \"" + chuHo.getHoTen() + 
                     "\" đã là thành viên của hộ khẩu khác (Mã số: " + existingMembership.get().getHoKhau().getMaSoHo() + ").");
             }
+        }
+        
+        // Lưu hộ khẩu
+        HoKhau savedHoKhau = hoKhauRepository.save(hoKhau);
+        System.out.println("✅ Đã lưu hộ khẩu mới: ID=" + savedHoKhau.getId() + ", Mã số: " + savedHoKhau.getMaSoHo());
+        
+        // --- LOGIC TẠO MỚI: TỰ ĐỘNG THÊM CHỦ HỘ VÀO DANH SÁCH THÀNH VIÊN ---
+        if (isNewHoKhau) { // Chỉ thực hiện khi TẠO MỚI hộ khẩu
             
-            // Tạo bản ghi ThanhVienHo cho Chủ hộ
-            ThanhVienHo thanhVienChuHo = new ThanhVienHo();
-            thanhVienChuHo.setHoKhau(savedHoKhau);
-            thanhVienChuHo.setNhanKhau(chuHo);
-            thanhVienChuHo.setQuanHeVoiChuHo("Chủ hộ");
-            thanhVienChuHo.setGhiChu("Tự động thêm khi tạo hộ khẩu");
-            
-            thanhVienHoRepository.save(thanhVienChuHo);
-            
-            // Cập nhật trạng thái nhân khẩu (sử dụng object đã fetch đầy đủ)
-            chuHo.setTinhTrang("Thường trú");
-            nhanKhauRepository.save(chuHo);
-            
-            // Ghi nhận thay đổi
-            ghiNhanThayDoiService.ghiNhanThemThanhVien(savedHoKhau, chuHo.getHoTen());
+            try {
+                // Tạo bản ghi ThanhVienHo cho Chủ hộ
+                ThanhVienHo thanhVienChuHo = new ThanhVienHo();
+                thanhVienChuHo.setHoKhau(savedHoKhau);
+                thanhVienChuHo.setNhanKhau(chuHo);
+                thanhVienChuHo.setQuanHeVoiChuHo("Chủ hộ");
+                thanhVienChuHo.setGhiChu("Tự động thêm khi tạo hộ khẩu");
+                
+                System.out.println("🔄 Đang thêm chủ hộ vào ThanhVienHo: HoKhauID=" + savedHoKhau.getId() + ", NhanKhauID=" + chuHo.getId());
+                ThanhVienHo savedThanhVien = thanhVienHoRepository.save(thanhVienChuHo);
+                System.out.println("✅ Đã thêm chủ hộ vào ThanhVienHo: ThanhVienID=" + savedThanhVien.getId() + ", NhanKhau=" + chuHo.getHoTen());
+                
+                // Cập nhật trạng thái nhân khẩu (sử dụng object đã fetch đầy đủ)
+                chuHo.setTinhTrang("Thường trú");
+                nhanKhauRepository.save(chuHo);
+                System.out.println("✅ Đã cập nhật tình trạng nhân khẩu: " + chuHo.getHoTen() + " -> Thường trú");
+                
+                // Ghi nhận thay đổi (không làm gián đoạn transaction chính nếu fail)
+                try {
+                    ghiNhanThayDoiService.ghiNhanThemThanhVien(savedHoKhau, chuHo.getHoTen());
+                    System.out.println("✅ Đã ghi nhận thay đổi lịch sử");
+                } catch (Exception logEx) {
+                    System.err.println("⚠️ Cảnh báo: Không thể ghi nhận lịch sử thay đổi: " + logEx.getMessage());
+                    // Không ném exception để không rollback toàn bộ transaction
+                }
+            } catch (Exception e) {
+                System.err.println("❌ LỖI khi thêm chủ hộ vào ThanhVienHo: " + e.getMessage());
+                e.printStackTrace();
+                throw new IllegalStateException("Không thể thêm chủ hộ vào danh sách thành viên: " + e.getMessage(), e);
+            }
         }
 
         return savedHoKhau;
@@ -110,7 +129,6 @@ public class HoKhauService {
 
     // 3.1. Cập nhật hộ khẩu (đặc biệt xử lý thay đổi Chủ hộ)
     @Transactional
-    //@PreAuthorize("hasAuthority('HO_KHAU:UPDATE')")
     public HoKhau updateHoKhau(Integer hoKhauId, UpdateHoKhauRequest request) {
         // Kiểm tra hộ khẩu có tồn tại không
         Optional<HoKhau> existingHoKhauOpt = hoKhauRepository.findById(hoKhauId);
@@ -208,7 +226,6 @@ public class HoKhauService {
 
     // 4. Xóa hộ khẩu (Chỉ xóa khi không còn thành viên nào)
     @Transactional
-    //@PreAuthorize("hasAuthority('HO_KHAU:DELETE')")
     public boolean deleteHoKhau(Integer id) {
         if (!hoKhauRepository.existsById(id)) {
             return false;
@@ -239,7 +256,6 @@ public class HoKhauService {
      * @return Hộ khẩu mới đã tạo
      */
     @Transactional
-    //@PreAuthorize("hasAuthority('HO_KHAU:CREATE')")
     public HoKhau tachHoKhau(Integer hoKhauCuId, TachHoRequest request) {
         
         // === BƯỚC 1: KIỂM TRA HỘ KHẨU CŨ TỒN TẠI ===

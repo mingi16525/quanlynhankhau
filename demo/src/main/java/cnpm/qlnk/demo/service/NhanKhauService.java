@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import cnpm.qlnk.demo.entity.HoKhau;
 import cnpm.qlnk.demo.entity.NhanKhau;
@@ -24,19 +23,16 @@ public class NhanKhauService {
     private HoKhauRepository hoKhauRepository; // Dùng để kiểm tra logic nghiệp vụ
 
     // 1. Lấy tất cả hồ sơ nhân khẩu
-    //@PreAuthorize("hasAuthority('NHAN_KHAU:READ')")
     public List<NhanKhau> getAllNhanKhau() {
         return nhanKhauRepository.findAll();
     }
 
     // 2. Lấy hồ sơ theo ID
-    //@PreAuthorize("hasAuthority('NHAN_KHAU:READ')")
     public Optional<NhanKhau> getNhanKhauById(Integer id) {
         return nhanKhauRepository.findById(id);
     }
     // 3. Tạo mới/Cập nhật hồ sơ
     @Transactional
-    //@PreAuthorize("hasAuthority('NHAN_KHAU:CREATE') or hasAuthority('NHAN_KHAU:UPDATE')")
     public NhanKhau saveNhanKhau(NhanKhau nhanKhau) {
         // --- LOGIC NGHIỆP VỤ: KIỂM TRA TRÙNG LẶP CCCD ---
         if (nhanKhau.getSoCCCD() != null && !nhanKhau.getSoCCCD().isEmpty()) {

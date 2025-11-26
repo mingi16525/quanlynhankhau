@@ -25,7 +25,7 @@ public class DanhSachThuPhiController {
      * GET /api/thuphi
      * Lấy TẤT CẢ danh sách thu
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<DanhSachThuPhi>> getAll() {
         System.out.println("=== GET ALL THU PHI ===");
@@ -37,7 +37,7 @@ public class DanhSachThuPhiController {
     /**
      * GET /api/thuphi/{id}
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         System.out.println("=== GET THU PHI ID: " + id + " ===");
@@ -51,7 +51,7 @@ public class DanhSachThuPhiController {
      * GET /api/thuphi/hokhau/{hoKhauId}
      * Lấy danh sách thu của một hộ
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/hokhau/{hoKhauId}")
     public ResponseEntity<List<DanhSachThuPhi>> getByHoKhau(@PathVariable Integer hoKhauId) {
         System.out.println("=== GET THU PHI BY HO KHAU: " + hoKhauId + " ===");
@@ -63,7 +63,7 @@ public class DanhSachThuPhiController {
      * GET /api/thuphi/khoanphi/{khoanPhiId}
      * Lấy danh sách thu theo khoản phí
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/khoanphi/{khoanPhiId}")
     public ResponseEntity<List<DanhSachThuPhi>> getByKhoanPhi(@PathVariable Long khoanPhiId) {
         System.out.println("=== GET THU PHI BY KHOAN PHI: " + khoanPhiId + " ===");
@@ -75,7 +75,7 @@ public class DanhSachThuPhiController {
      * ✅ GET /api/thuphi/khoanphi/{khoanPhiId}/chuadong
      * Lấy danh sách các hộ CHƯA ĐÓNG của một khoản phí
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/khoanphi/{khoanPhiId}/chuadong")
     public ResponseEntity<List<DanhSachThuPhi>> getHoChuaDong(@PathVariable Long khoanPhiId) {
         System.out.println("=== GET HO CHUA DONG - KHOAN PHI: " + khoanPhiId + " ===");
@@ -88,7 +88,7 @@ public class DanhSachThuPhiController {
      * ✅ GET /api/thuphi/khoanphi/{khoanPhiId}/dadong
      * Lấy danh sách các hộ ĐÃ ĐÓNG của một khoản phí
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/khoanphi/{khoanPhiId}/dadong")
     public ResponseEntity<List<DanhSachThuPhi>> getHoDaDong(@PathVariable Long khoanPhiId) {
         System.out.println("=== GET HO DA DONG - KHOAN PHI: " + khoanPhiId + " ===");
@@ -101,7 +101,7 @@ public class DanhSachThuPhiController {
      * ✅ GET /api/thuphi/khoanphi/{khoanPhiId}/thongke
      * Lấy thống kê chi tiết của một khoản phí
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/khoanphi/{khoanPhiId}/thongke")
     public ResponseEntity<Map<String, Object>> getThongKe(@PathVariable Long khoanPhiId) {
         System.out.println("=== GET THONG KE - KHOAN PHI: " + khoanPhiId + " ===");
@@ -113,7 +113,7 @@ public class DanhSachThuPhiController {
      * GET /api/thuphi/trangthai/{trangThai}
      * Lọc theo trạng thái: "Chưa đóng" hoặc "Đã đóng"
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/trangthai/{trangThai}")
     public ResponseEntity<List<DanhSachThuPhi>> getByTrangThai(@PathVariable String trangThai) {
         System.out.println("=== GET BY TRANG THAI: " + trangThai + " ===");
@@ -125,7 +125,7 @@ public class DanhSachThuPhiController {
      * ✅ POST /api/thuphi/taomoi/khoanphi/{khoanPhiId}
      * Tạo danh sách thu cho TẤT CẢ hộ khẩu
      */
-    @PreAuthorize("hasAuthority('THU_PHI:CREATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:CREATE') or hasAuthority('*:*')")
     @PostMapping("/taomoi/khoanphi/{khoanPhiId}")
     public ResponseEntity<?> createThuPhiChoTatCaHo(@PathVariable Long khoanPhiId) {
         System.out.println("=== CREATE THU PHI CHO TAT CA HO - KHOAN PHI: " + khoanPhiId + " ===");
@@ -152,7 +152,7 @@ public class DanhSachThuPhiController {
      * POST /api/thuphi
      * Tạo khoản thu cho 1 hộ
      */
-    @PreAuthorize("hasAuthority('THU_PHI:CREATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody DanhSachThuPhi thuPhi) {
         System.out.println("=== CREATE THU PHI ===");
@@ -175,7 +175,7 @@ public class DanhSachThuPhiController {
     /**
      * PUT /api/thuphi/{id}
      */
-    @PreAuthorize("hasAuthority('THU_PHI:UPDATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody DanhSachThuPhi thuPhi) {
         System.out.println("=== UPDATE THU PHI ID: " + id + " ===");
@@ -205,7 +205,7 @@ public class DanhSachThuPhiController {
      * ✅ PUT /api/thuphi/{id}/trangthai
      * Cập nhật trạng thái thanh toán
      */
-    @PreAuthorize("hasAuthority('THU_PHI:UPDATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}/trangthai")
     public ResponseEntity<?> updateTrangThai(
             @PathVariable Long id,
@@ -237,7 +237,7 @@ public class DanhSachThuPhiController {
     /**
      * DELETE /api/thuphi/{id}
      */
-    @PreAuthorize("hasAuthority('THU_PHI:DELETE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         System.out.println("=== DELETE THU PHI ID: " + id + " ===");
@@ -262,7 +262,7 @@ public class DanhSachThuPhiController {
     /**
      * GET /api/thuphi/search?keyword={keyword}
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<DanhSachThuPhi>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH THU PHI: " + keyword + " ===");
@@ -273,7 +273,7 @@ public class DanhSachThuPhiController {
     /**
      * GET /api/thuphi/daterange?start={start}&end={end}
      */
-    @PreAuthorize("hasAuthority('THU_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('DANH_SACH_THU:READ') or hasAuthority('*:*')")
     @GetMapping("/daterange")
     public ResponseEntity<List<DanhSachThuPhi>> getByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,

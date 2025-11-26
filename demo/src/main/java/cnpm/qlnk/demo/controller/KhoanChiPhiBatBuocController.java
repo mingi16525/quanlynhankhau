@@ -23,7 +23,7 @@ public class KhoanChiPhiBatBuocController {
      * GET /api/khoanphi
      * Lấy TẤT CẢ khoản phí
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:READ') or hasAuthority('*:*')")
     @GetMapping
     public ResponseEntity<List<KhoanChiPhiBatBuoc>> getAll() {
         System.out.println("=== GET ALL KHOAN PHI ===");
@@ -36,7 +36,7 @@ public class KhoanChiPhiBatBuocController {
      * GET /api/khoanphi/{id}
      * Lấy chi tiết 1 khoản phí
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:READ') or hasAuthority('*:*')")
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
         System.out.println("=== GET KHOAN PHI BY ID: " + id + " ===");
@@ -57,7 +57,7 @@ public class KhoanChiPhiBatBuocController {
      * GET /api/khoanphi/active
      * Lấy các khoản phí đang hoạt động
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:READ') or hasAuthority('*:*')")
     @GetMapping("/active")
     public ResponseEntity<List<KhoanChiPhiBatBuoc>> getActive() {
         System.out.println("=== GET ACTIVE KHOAN PHI ===");
@@ -70,7 +70,7 @@ public class KhoanChiPhiBatBuocController {
      * GET /api/khoanphi/loai/{loaiKhoanPhi}
      * Lấy khoản phí theo loại: "Bắt buộc", "Tự nguyện", "Khác"
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:READ') or hasAuthority('*:*')")
     @GetMapping("/loai/{loaiKhoanPhi}")
     public ResponseEntity<List<KhoanChiPhiBatBuoc>> getByLoai(@PathVariable String loaiKhoanPhi) {
         System.out.println("=== GET KHOAN PHI BY LOAI: " + loaiKhoanPhi + " ===");
@@ -83,7 +83,7 @@ public class KhoanChiPhiBatBuocController {
      * POST /api/khoanphi
      * Tạo khoản phí bắt buộc mới
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:CREATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:CREATE') or hasAuthority('*:*')")
     @PostMapping
     public ResponseEntity<?> create(@RequestBody KhoanChiPhiBatBuoc khoanPhi) {
         System.out.println("=== CREATE KHOAN PHI ===");
@@ -114,7 +114,7 @@ public class KhoanChiPhiBatBuocController {
      * PUT /api/khoanphi/{id}
      * Cập nhật thông tin khoản phí
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:UPDATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable Long id,
@@ -152,7 +152,7 @@ public class KhoanChiPhiBatBuocController {
      * DELETE /api/khoanphi/{id}
      * Xóa khoản phí
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:DELETE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:DELETE') or hasAuthority('*:*')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         System.out.println("=== DELETE KHOAN PHI ID: " + id + " ===");
@@ -184,7 +184,7 @@ public class KhoanChiPhiBatBuocController {
      * GET /api/khoanphi/search?keyword={keyword}
      * Tìm kiếm khoản phí theo tên
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:READ') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:READ') or hasAuthority('*:*')")
     @GetMapping("/search")
     public ResponseEntity<List<KhoanChiPhiBatBuoc>> search(@RequestParam String keyword) {
         System.out.println("=== SEARCH KHOAN PHI: " + keyword + " ===");
@@ -199,7 +199,7 @@ public class KhoanChiPhiBatBuocController {
      * PUT /api/khoanphi/{id}/trangthai
      * Cập nhật trạng thái khoản phí
      */
-    @PreAuthorize("hasAuthority('KHOAN_PHI:UPDATE') or hasAuthority('*:*')")
+    @PreAuthorize("hasAuthority('KHOAN_CHI_BAT_BUOC:UPDATE') or hasAuthority('*:*')")
     @PutMapping("/{id}/trangthai")
     public ResponseEntity<?> updateTrangThai(
             @PathVariable Long id,

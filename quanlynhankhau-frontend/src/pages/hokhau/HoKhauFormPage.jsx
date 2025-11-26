@@ -24,20 +24,34 @@ const HoKhauFormPage = () => {
     const isEditMode = id && mode === 'edit';
     const title = isEditMode ? "Sửa đổi Sổ Hộ khẩu" : "Thêm mới Sổ Hộ khẩu";
 
-    // 1. Fetch dữ liệu nhân khẩu để chọn Chủ hộ
+    // 1. Fetch dữ liệu nhân khẩu để chọn Chủ hộ (CHỈ LẤY NGƯỜI CHƯA CÓ HỘ KHẨU)
     useEffect(() => {
         const fetchNhanKhaus = async () => {
             try {
-                // Giả định API này trả về danh sách NhanKhau (ID, HoTen)
-                const res = await apiClient.get('/nhankhau'); 
+                // Lấy danh sách nhân khẩu chưa có hộ khẩu (available)
+                const res = await apiClient.get('/nhankhau/available'); 
                 setNhanKhauList(res.data);
                 setFilteredNhanKhau(res.data); // Hiển thị tất cả ban đầu
             } catch (err) {
                 message.error('Không thể tải danh sách Nhân khẩu để chọn Chủ hộ.');
             }
         };
-        fetchNhanKhaus();
-    }, []);
+        
+        // Chỉ fetch khi ở chế độ tạo mới
+        if (!isEditMode) {
+            fetchNhanKhaus();
+        } else {
+            // Ở chế độ edit, lấy tất cả nhân khẩu
+            apiClient.get('/nhankhau')
+                .then(res => {
+                    setNhanKhauList(res.data);
+                    setFilteredNhanKhau(res.data);
+                })
+                .catch(err => {
+                    message.error('Không thể tải danh sách Nhân khẩu.');
+                });
+        }
+    }, [isEditMode]);
 
     const handleSearch = (value) => {
         if (searchTimeout) clearTimeout(searchTimeout);

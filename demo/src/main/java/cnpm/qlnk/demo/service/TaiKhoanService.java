@@ -21,13 +21,13 @@ public class TaiKhoanService {
     @Autowired private PasswordEncoder passwordEncoder;
 
     // 1. Xem tất cả tài khoản
-    @PreAuthorize("hasAuthority('ADMIN:READ')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:READ')")
     public List<TaiKhoan> getAllTaiKhoan() {
         return taiKhoanRepository.findAll();
     }
 
     // 2. Lấy tài khoản theo ID
-    @PreAuthorize("hasAuthority('ADMIN:READ')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:READ')")
     public TaiKhoan getTaiKhoanById(Integer id) {
         return taiKhoanRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với ID: " + id));
@@ -35,7 +35,7 @@ public class TaiKhoanService {
 
     // 3. Tạo tài khoản mới
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:CREATE')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:CREATE')")
     public TaiKhoan createTaiKhoan(TaiKhoan taiKhoan, String tenVaiTro) {
         // Kiểm tra vai trò
         VaiTro vaiTro = vaiTroRepository.findByTenVaiTro(tenVaiTro);
@@ -62,7 +62,7 @@ public class TaiKhoanService {
 
     // 4. Cập nhật tài khoản
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:UPDATE')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:UPDATE')")
     public TaiKhoan updateTaiKhoan(Integer id, TaiKhoan taiKhoanUpdate, String tenVaiTro) {
         TaiKhoan existingTk = taiKhoanRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy tài khoản với ID: " + id));
@@ -99,7 +99,7 @@ public class TaiKhoanService {
 
     // 5. Khóa/Mở khóa tài khoản
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:UPDATE')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:UPDATE')")
     public boolean lockTaiKhoan(Integer id) {
         TaiKhoan tk = taiKhoanRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại với ID: " + id));
@@ -114,7 +114,7 @@ public class TaiKhoanService {
 
     // 6. Reset mật khẩu
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:UPDATE')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:UPDATE')")
     public void resetPassword(Integer id, String newPassword) {
         TaiKhoan tk = taiKhoanRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại với ID: " + id));
@@ -125,7 +125,7 @@ public class TaiKhoanService {
 
     // 7. Xóa tài khoản
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:DELETE')")
+    @PreAuthorize("hasAuthority('TAI_KHOAN:DELETE')")
     public void deleteTaiKhoan(Integer id) {
         TaiKhoan tk = taiKhoanRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại với ID: " + id));

@@ -16,20 +16,20 @@ public class VaiTroService {
     private VaiTroRepository vaiTroRepository;
 
     // 1. Lấy tất cả vai trò
-    @PreAuthorize("hasAuthority('ADMIN:READ')")
+    @PreAuthorize("hasAuthority('VAI_TRO:READ')")
     public List<VaiTro> getAllVaiTro() {
         return vaiTroRepository.findAll();
     }
 
     // 2. Lấy vai trò theo ID
-    @PreAuthorize("hasAuthority('ADMIN:READ')")
+    @PreAuthorize("hasAuthority('VAI_TRO:READ')")
     public VaiTro getVaiTroById(Integer id) {
         return vaiTroRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vai trò với ID: " + id));
     }
 
     // 3. Lấy vai trò theo tên
-    @PreAuthorize("hasAuthority('ADMIN:READ')")
+    @PreAuthorize("hasAuthority('VAI_TRO:READ')")
     public VaiTro getVaiTroByTen(String tenVaiTro) {
         VaiTro vaiTro = vaiTroRepository.findByTenVaiTro(tenVaiTro);
         if (vaiTro == null) {
@@ -40,7 +40,7 @@ public class VaiTroService {
 
     // 4. Tạo vai trò mới
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:CREATE')")
+    @PreAuthorize("hasAuthority('VAI_TRO:CREATE')")
     public VaiTro createVaiTro(VaiTro vaiTro) {
         // Kiểm tra trùng tên vai trò
         if (vaiTroRepository.findByTenVaiTro(vaiTro.getTenVaiTro()) != null) {
@@ -57,7 +57,7 @@ public class VaiTroService {
 
     // 5. Cập nhật vai trò
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:UPDATE')")
+    @PreAuthorize("hasAuthority('VAI_TRO:UPDATE')")
     public VaiTro updateVaiTro(Integer id, VaiTro vaiTroUpdate) {
         VaiTro existingVaiTro = vaiTroRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vai trò với ID: " + id));
@@ -80,7 +80,7 @@ public class VaiTroService {
 
     // 6. Xóa vai trò
     @Transactional
-    @PreAuthorize("hasAuthority('ADMIN:DELETE')")
+    @PreAuthorize("hasAuthority('VAI_TRO:DELETE')")
     public void deleteVaiTro(Integer id) {
         VaiTro vaiTro = vaiTroRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy vai trò với ID: " + id));

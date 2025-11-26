@@ -290,21 +290,51 @@ const NhanKhauFormPage = () => {
 
             <Col xs={24} md={8}>
               <Form.Item
+                name="quocTich"
+                label="Quốc tịch"
+                initialValue="Việt Nam"
+              >
+                <Input placeholder="Việt Nam" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
                 name="queQuan"
                 label="Quê quán"
               >
                 <Input placeholder="Hà Nội" />
               </Form.Item>
             </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="noiSinh"
+                label="Nơi sinh"
+              >
+                <Input placeholder="Bệnh viện ABC, Hà Nội" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="nguyenQuan"
+                label="Nguyên quán"
+              >
+                <Input placeholder="Xã ABC, Huyện XYZ, Tỉnh DEF" />
+              </Form.Item>
+            </Col>
           </Row>
 
           {/* ========== NGHỀ NGHIỆP ========== */}
           <h3 style={{ marginTop: '24px', marginBottom: '16px', color: '#1890ff' }}>
-            Nghề nghiệp
+            Nghề nghiệp & Học vấn
           </h3>
 
           <Row gutter={16}>
-            <Col xs={24} md={12}>
+            <Col xs={24} md={8}>
               <Form.Item
                 name="ngheNghiep"
                 label="Nghề nghiệp"
@@ -313,12 +343,71 @@ const NhanKhauFormPage = () => {
               </Form.Item>
             </Col>
 
-            <Col xs={24} md={12}>
+            <Col xs={24} md={8}>
               <Form.Item
                 name="noiLamViec"
                 label="Nơi làm việc/Học tập"
               >
                 <Input placeholder="Công ty ABC, Trường ĐH XYZ..." />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="trinhDoHocVan"
+                label="Trình độ học vấn"
+              >
+                <Select placeholder="Chọn trình độ">
+                  <Option value="Tiểu học">Tiểu học</Option>
+                  <Option value="THCS">THCS</Option>
+                  <Option value="THPT">THPT</Option>
+                  <Option value="Trung cấp">Trung cấp</Option>
+                  <Option value="Cao đẳng">Cao đẳng</Option>
+                  <Option value="Đại học">Đại học</Option>
+                  <Option value="Thạc sĩ">Thạc sĩ</Option>
+                  <Option value="Tiến sĩ">Tiến sĩ</Option>
+                  <Option value="Khác">Khác</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* ========== LIÊN HỆ ========== */}
+          <h3 style={{ marginTop: '24px', marginBottom: '16px', color: '#1890ff' }}>
+            Thông tin liên hệ
+          </h3>
+
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="soDienThoai"
+                label="Số điện thoại"
+                rules={[
+                  { pattern: /^(0|\+84)[0-9]{9,10}$/, message: 'Số điện thoại không hợp lệ!' }
+                ]}
+              >
+                <Input placeholder="0901234567" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[
+                  { type: 'email', message: 'Email không hợp lệ!' }
+                ]}
+              >
+                <Input placeholder="example@gmail.com" />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Form.Item
+                name="diaChiThuongTru"
+                label="Địa chỉ thường trú"
+              >
+                <Input placeholder="Số nhà, đường, phường, quận..." />
               </Form.Item>
             </Col>
           </Row>
