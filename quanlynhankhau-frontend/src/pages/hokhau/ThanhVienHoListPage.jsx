@@ -37,7 +37,9 @@ import {
   EditOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import hoKhauApi from '../../api/hoKhauApi';
+import nhanKhauApi from '../../api/nhanKhauAPI';
+import thanhVienHoApi from '../../api/thanhVienHoApi';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -68,21 +70,21 @@ const ThanhVienHoListPage = () => {
         setLoading(true);
         try {
             // 1. Lấy thông tin Hộ khẩu
-            const hoKhauRes = await apiClient.get(`/hokhau/${hoKhauId}`);
+            const hoKhauRes = await hoKhauApi.getById(hoKhauId);
             console.log('📥 Hộ khẩu info:', hoKhauRes.data);
             setHoKhauInfo(hoKhauRes.data);
 
             // 2. Lấy danh sách thành viên (từ API riêng)
-            const thanhVienRes = await apiClient.get(`/hokhau/${hoKhauId}/thanhvien`);
+            const thanhVienRes = await hoKhauApi.getThanhVien(hoKhauId);
             console.log('📥 Thành viên list:', thanhVienRes.data);
             setThanhVienList(thanhVienRes.data);
 
             // 3. Lấy TẤT CẢ nhân khẩu (để chọn chủ hộ mới)
-            const allNkRes = await apiClient.get('/nhankhau');
+            const allNkRes = await nhanKhauApi.getAll();
             setAllNhanKhau(allNkRes.data);
             
             // 4. Lấy nhân khẩu CHƯA thuộc hộ nào (để thêm thành viên)
-            const availableNkRes = await apiClient.get('/nhankhau/available');
+            const availableNkRes = await nhanKhauApi.getAvailable();
             console.log('📥 Available nhân khẩu:', availableNkRes.data);
             setAvailableNhanKhau(availableNkRes.data);
 
@@ -155,7 +157,7 @@ const ThanhVienHoListPage = () => {
 
             console.log('📤 Updating Chủ hộ with payload:', payload);
 
-            await apiClient.put(`/hokhau/${hoKhauId}`, payload);
+            await hoKhauApi.update(hoKhauId, payload);
 
             message.success('✅ Thay đổi Chủ hộ thành công!');
             setIsModalVisible(false);
@@ -186,9 +188,7 @@ const ThanhVienHoListPage = () => {
         setSearchingNhanKhau(true);
         try {
             // Gọi API tìm kiếm nhân khẩu theo họ tên hoặc CCCD
-            const response = await apiClient.get('/nhankhau/search', {
-                params: { keyword: searchText }
-            });
+            const response = await nhanKhauApi.search(searchText);
             
             // Lọc bỏ những người đã có trong hộ khẩu
             const currentMemberIds = thanhVienList.map(tv => tv.nhanKhau?.id);
@@ -224,7 +224,7 @@ const ThanhVienHoListPage = () => {
 
             console.log('📤 Adding member:', payload);
 
-            await apiClient.post('/thanhvienho', payload);
+            await thanhVienHoApi.create(payload);
 
             message.success('✅ Thêm thành viên thành công!');
             setIsAddMemberModalVisible(false);
@@ -272,7 +272,7 @@ const ThanhVienHoListPage = () => {
 
             console.log('📤 Tách hộ payload:', payload);
 
-            await apiClient.post(`/hokhau/${hoKhauId}/tach`, payload);
+            await hoKhauApi.tachHo(hoKhauId, payload);
 
             message.success('✅ Tách hộ khẩu thành công!');
             setIsTachHoModalVisible(false);
@@ -306,7 +306,7 @@ const ThanhVienHoListPage = () => {
 
         setLoading(true);
         try {
-            await apiClient.delete(`/thanhvienho/${record.id}`);
+            await thanhVienHoApi.delete(record.id);
             message.success('✅ Xóa thành viên khỏi hộ khẩu thành công');
             fetchData();
         } catch (error) {

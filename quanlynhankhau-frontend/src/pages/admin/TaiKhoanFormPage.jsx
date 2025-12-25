@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, Select, message, Space, Spin } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined, SaveOutlined } from '@ant-design/icons';
-import apiClient from '../../api/apiClient';
+import adminApi from '../../api/adminApi';
 
 const { Option } = Select;
 
@@ -20,7 +20,7 @@ const TaiKhoanFormPage = () => {
     // Load danh sách vai trò
     const fetchVaiTro = async () => {
         try {
-            const response = await apiClient.get('/admin/vaitro');
+            const response = await adminApi.getVaiTro();
             console.log('Vai trò:', response.data);
             setVaiTroList(response.data);
         } catch (error) {
@@ -89,10 +89,7 @@ const TaiKhoanFormPage = () => {
                     updateData.matKhau = values.matKhau;
                 }
 
-                await apiClient.put(
-                    `/admin/taikhoan/${id}?tenVaiTro=${encodeURIComponent(tenVaiTro)}`,
-                    updateData
-                );
+                await adminApi.updateTaiKhoanVaiTro(id, tenVaiTro, updateData);
                 message.success('Cập nhật tài khoản thành công');
             } else {
                 // Tạo tài khoản mới
@@ -102,10 +99,7 @@ const TaiKhoanFormPage = () => {
                     trangThai: values.trangThai || 'Active',
                 };
 
-                await apiClient.post(
-                    `/admin/taikhoan/${encodeURIComponent(tenVaiTro)}`,
-                    newData
-                );
+                await adminApi.createTaiKhoan(tenVaiTro, newData);
                 message.success('Tạo tài khoản thành công');
             }
 

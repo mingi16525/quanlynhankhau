@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Input, Button, message, Card } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import apiClient from '../api/apiClient';
+import loginApi from '../api/loginAPI';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 
 const LoginPage = () => {
@@ -23,7 +23,7 @@ const LoginPage = () => {
         console.log('Login credentials:', values);
         
         try {
-            const response = await apiClient.post('/auth/login', values);
+            const response = await loginApi.login(values);
             
             console.log('=== RESPONSE FROM BACKEND ===');
             console.log('Full response:', response);

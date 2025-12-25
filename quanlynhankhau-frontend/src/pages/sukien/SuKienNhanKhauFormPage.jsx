@@ -23,7 +23,8 @@ import {
   CloseCircleOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import suKienApi from '../../api/suKienApi';
+import nhanKhauApi from '../../api/nhanKhauAPI';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
@@ -57,7 +58,7 @@ const SuKienNhanKhauFormPage = () => {
 
   const fetchAllNhanKhau = async () => {
     try {
-      const response = await apiClient.get('/nhankhau');
+      const response = await nhanKhauApi.getAll();
       setAllNhanKhau(response.data);
       setFilteredNhanKhau(response.data.filter(nk => nk.tinhTrang !== 'Đã mất'));
     } catch (error) {
@@ -93,7 +94,7 @@ const SuKienNhanKhauFormPage = () => {
   const fetchRecord = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`/sukien/${id}`);
+      const response = await suKienApi.getById(id);
       console.log('📥 Loading record:', response.data);
       loadFormData(response.data);
     } catch (error) {
@@ -136,11 +137,11 @@ const SuKienNhanKhauFormPage = () => {
 
       let response;
       if (isEditMode) {
-        response = await apiClient.put(`/sukien/${id}`, payload);
+        response = await suKienApi.update(id, payload);
         message.success('✅ Cập nhật thành công');
         navigate('/dashboard/sukien');
       } else {
-        response = await apiClient.post('/sukien', payload);
+        response = await suKienApi.create(payload);
         message.success('✅ Ghi nhận sự kiện thành công');
         
         // Nếu là sự kiện SINH, chuyển đến trang thêm nhân khẩu mới

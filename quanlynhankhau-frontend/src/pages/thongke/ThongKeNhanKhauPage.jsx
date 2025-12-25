@@ -8,7 +8,7 @@ import {
     ReloadOutlined, BarChartOutlined, PieChartOutlined,
     HomeOutlined, LogoutOutlined
 } from '@ant-design/icons';
-import apiClient from '../../api/apiClient';
+import thongKeApi from '../../api/thongKeApi';
 import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
@@ -25,21 +25,11 @@ const ThongKeNhanKhauPage = () => {
     const fetchThongKe = async (tuNgay = null, denNgay = null) => {
         setLoading(true);
         try {
-            let url = '/thongke/nhankhau';
-            const params = [];
-            
-            if (tuNgay) {
-                params.push(`tuNgay=${tuNgay}`);
-            }
-            if (denNgay) {
-                params.push(`denNgay=${denNgay}`);
-            }
-            
-            if (params.length > 0) {
-                url += '?' + params.join('&');
-            }
-            
-            const response = await apiClient.get(url);
+            // Chỉ truyền parameters nếu có giá trị thực
+            const response = await thongKeApi.getNhanKhau(
+                tuNgay && tuNgay !== 'null' ? tuNgay : null,
+                denNgay && denNgay !== 'null' ? denNgay : null
+            );
             console.log('📊 Thống kê:', response.data);
             setThongKeData(response.data);
         } catch (error) {
@@ -54,7 +44,7 @@ const ThongKeNhanKhauPage = () => {
     const fetchDanhSachTheoNhom = async (nhomTuoi) => {
         setLoading(true);
         try {
-            const response = await apiClient.get(`/thongke/nhankhau/nhomtuoi/${nhomTuoi}`);
+            const response = await thongKeApi.getNhanKhauByNhomTuoi(nhomTuoi);
             console.log(`📋 Danh sách ${nhomTuoi}:`, response.data);
             setDanhSachTheoNhom(response.data);
         } catch (error) {
@@ -156,8 +146,13 @@ const ThongKeNhanKhauPage = () => {
 
     if (loading && !thongKeData) {
         return (
-            <div style={{ textAlign: 'center', padding: '100px' }}>
-                <Spin size="large" tip="Đang tải dữ liệu..." />
+            <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                minHeight: '400px' 
+            }}>
+                <Spin size="large" />
             </div>
         );
     }

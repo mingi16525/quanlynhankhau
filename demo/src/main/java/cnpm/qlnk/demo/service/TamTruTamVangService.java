@@ -63,6 +63,9 @@ public class TamTruTamVangService {
 
         // ========== TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI NHÂN KHẨU ==========
         updateNhanKhauTinhTrang(nhanKhau, saved);
+        
+        // ========== CẬP NHẬT GHI CHÚ VỚI NỠI CHUYỂN ĐẾN ==========
+        updateNhanKhauGhiChu(nhanKhau, saved);
 
         System.out.println("✅ Created TamTruTamVang ID: " + saved.getId());
         System.out.println("✅ Updated NhanKhau tinhTrang: " + nhanKhau.getTinhTrang());
@@ -89,6 +92,9 @@ public class TamTruTamVangService {
 
         // Cập nhật trạng thái Nhân khẩu
         updateNhanKhauTinhTrang(nhanKhau, updated);
+        
+        // Cập nhật ghi chú với nơi chuyển đến
+        updateNhanKhauGhiChu(nhanKhau, updated);
 
         System.out.println("✅ Updated TamTruTamVang ID: " + updated.getId());
         System.out.println("✅ Updated NhanKhau tinhTrang: " + nhanKhau.getTinhTrang());
@@ -113,6 +119,11 @@ public class TamTruTamVangService {
 
         // ========== KHÔI PHỤC TRẠNG THÁI VỀ "Thường trú" ==========
         if (nhanKhau != null) {
+            // Xóa nơi chuyển đến khỏi ghi chú nếu đăng ký bị xóa là Tạm vắng
+            if ("Tạm vắng".equals(record.getLoai())) {
+                removeNoiChuyenDenFromGhiChu(nhanKhau);
+            }
+            
             // Kiểm tra xem còn đăng ký nào khác không
             List<TamTruTamVang> otherRecords = tamTruTamVangRepository.findByNhanKhauId(nhanKhau.getId());
             
@@ -125,12 +136,66 @@ public class TamTruTamVangService {
                 // Còn đăng ký khác -> Cập nhật theo đăng ký mới nhất
                 TamTruTamVang latest = otherRecords.get(otherRecords.size() - 1);
                 updateNhanKhauTinhTrang(nhanKhau, latest);
+                updateNhanKhauGhiChu(nhanKhau, latest);
             }
         }
 
         return true;
     }
 
+    // ========== HELPER: CẬP NHẬT GHI CHÚ VỚI NỠI CHUYỂN ĐẾN ==========
+    
+    private void updateNhanKhauGhiChu(NhanKhau nhanKhau, TamTruTamVang record) {
+        // Chỉ thêm nơi chuyển đến vào ghi chú nếu là Tạm vắng và có địa chỉ
+        if ("Tạm vắng".equals(record.getLoai()) && 
+            record.getNoiDen() != null && 
+            !record.getNoiDen().trim().isEmpty()) {
+            
+            String currentNote = nhanKhau.getGhiChu();
+            String addressNote = "Nơi chuyển đến: " + record.getNoiDen();
+            
+            // Kiểm tra xem ghi chú đã có nơi chuyển đến chưa
+            if (currentNote == null || currentNote.trim().isEmpty()) {
+                nhanKhau.setGhiChu(addressNote);
+            } else if (!currentNote.contains("Nơi chuyển đến:")) {
+                // Thêm vào cuối ghi chú hiện tại
+                nhanKhau.setGhiChu(currentNote + "; " + addressNote);
+            } else {
+                // Thay thế nơi chuyển đến cũ bằng mới
+                String updatedNote = currentNote.replaceAll(
+                    "Nơi chuyển đến:[^;]*", 
+                    addressNote
+                ).trim();
+                // Loại bỏ dấu ; thừa nếu có
+                updatedNote = updatedNote.replaceAll(";\\s*;", ";").trim();
+                nhanKhau.setGhiChu(updatedNote);
+            }
+            
+            nhanKhauRepository.save(nhanKhau);
+            System.out.println("📝 Updated NhanKhau ghiChu with nơi chuyển đến");
+        }
+    }
+    
+    // ========== HELPER: XÓA NỠI CHUYỂN ĐẾN KHỎI GHI CHÚ ==========
+    
+    private void removeNoiChuyenDenFromGhiChu(NhanKhau nhanKhau) {
+        String currentNote = nhanKhau.getGhiChu();
+        if (currentNote != null && currentNote.contains("Nơi chuyển đến:")) {
+            // Xóa phần nơi chuyển đến
+            String updatedNote = currentNote.replaceAll(
+                ";?\\s*Nơi chuyển đến:[^;]*;?\\s*", 
+                ""
+            ).trim();
+            
+            // Loại bỏ dấu ; thừa ở đầu hoặc cuối
+            updatedNote = updatedNote.replaceAll("^;\\s*|\\s*;$", "").trim();
+            
+            nhanKhau.setGhiChu(updatedNote.isEmpty() ? null : updatedNote);
+            nhanKhauRepository.save(nhanKhau);
+            System.out.println("🗑️ Removed nơi chuyển đến from NhanKhau ghiChu");
+        }
+    }
+    
     // ========== HELPER: CẬP NHẬT TRẠNG THÁI NHÂN KHẨU ==========
     
     private void updateNhanKhauTinhTrang(NhanKhau nhanKhau, TamTruTamVang record) {

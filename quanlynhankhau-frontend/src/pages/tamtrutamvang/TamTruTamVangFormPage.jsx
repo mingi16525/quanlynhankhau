@@ -21,7 +21,8 @@ import {
   UserOutlined 
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import tamTruTamVangApi from '../../api/tamTruTamVangApi';
+import nhanKhauApi from '../../api/nhanKhauAPI';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
@@ -55,7 +56,7 @@ const TamTruTamVangFormPage = () => {
 
   const fetchAllNhanKhau = async () => {
     try {
-      const response = await apiClient.get('/nhankhau');
+      const response = await nhanKhauApi.getAll();
       setAllNhanKhau(response.data);
       setFilteredNhanKhau(response.data);
     } catch (error) {
@@ -87,7 +88,7 @@ const TamTruTamVangFormPage = () => {
   const fetchRecord = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`/tamtrutamvang/${id}`);
+      const response = await tamTruTamVangApi.getById(id);
       console.log('📥 Loading record:', response.data);
       loadFormData(response.data);
     } catch (error) {
@@ -131,10 +132,10 @@ const TamTruTamVangFormPage = () => {
 
       let response;
       if (isEditMode) {
-        response = await apiClient.put(`/tamtrutamvang/${id}`, payload);
+        response = await tamTruTamVangApi.update(id, payload);
         message.success('✅ Cập nhật thành công');
       } else {
-        response = await apiClient.post('/tamtrutamvang', payload);
+        response = await tamTruTamVangApi.create(payload);
         message.success('✅ Đăng ký thành công');
       }
 

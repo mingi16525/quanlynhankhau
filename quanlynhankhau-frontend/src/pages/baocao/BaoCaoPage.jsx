@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Row, Col, Spin, message, Divider, Typography } from 'antd';
 // Import a charting library if you plan to use it (e.g., Ant Design Charts)
 // import { Pie, Column } from '@ant-design/charts';
-import apiClient from '../../api/apiClient'; // Ensure this path is correct
+import baoCaoApi from '../../api/baoCaoApi'; // Ensure this path is correct
 
 const { Title } = Typography;
 
@@ -16,11 +16,11 @@ const BaoCaoPage = () => {
             setLoading(true);
             try {
                 // Fetch Income/Expense Summary
-                const resThuChi = await apiClient.get('/baocao/thuchitonghop');
+                const resThuChi = await baoCaoApi.getThuChiTongHop();
                 setDataThuChi(resThuChi.data || { tongThu: 0, tongChi: 0 }); // Handle potential null response
 
                 // Fetch Gender Statistics
-                const resGioiTinh = await apiClient.get('/baocao/gioitinh');
+                const resGioiTinh = await baoCaoApi.getGioiTinh();
                 setDataGioiTinh(resGioiTinh.data || []); // Handle potential null response
 
             } catch (error) {

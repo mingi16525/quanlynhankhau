@@ -28,7 +28,7 @@ import {
   BarChartOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import suKienApi from '../../api/suKienApi';
 import dayjs from 'dayjs';
 
 const { TabPane } = Tabs;
@@ -50,7 +50,7 @@ const SuKienNhanKhauListPage = () => {
     const fetchSinh = async () => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/sukien/loai/sinh');
+            const response = await suKienApi.getSinh();
             console.log('📥 Sự kiện Sinh:', response.data);
             setSinhList(response.data);
         } catch (error) {
@@ -64,7 +64,7 @@ const SuKienNhanKhauListPage = () => {
     const fetchMat = async () => {
         setLoading(true);
         try {
-            const response = await apiClient.get('/sukien/loai/mat');
+            const response = await suKienApi.getMat();
             console.log('📥 Sự kiện Mất:', response.data);
             setMatList(response.data);
         } catch (error) {
@@ -77,7 +77,7 @@ const SuKienNhanKhauListPage = () => {
 
     const fetchStats = async () => {
         try {
-            const response = await apiClient.get('/sukien/stats');
+            const response = await suKienApi.getStats();
             console.log('📊 Stats:', response.data);
             setStats(response.data);
         } catch (error) {
@@ -111,7 +111,7 @@ const SuKienNhanKhauListPage = () => {
 
         setLoading(true);
         try {
-            const response = await apiClient.get(`/sukien/search?keyword=${value}`);
+            const response = await suKienApi.search(value);
             console.log('🔍 Search results:', response.data);
             
             const filtered = response.data.filter(item => 
@@ -155,8 +155,9 @@ const SuKienNhanKhauListPage = () => {
         setLoading(true);
 
         try {
-            const response = await apiClient.get(
-                `/sukien/daterange?start=${start.format('YYYY-MM-DD')}&end=${end.format('YYYY-MM-DD')}`
+            const response = await suKienApi.getByDateRange(
+                start.format('YYYY-MM-DD'),
+                end.format('YYYY-MM-DD')
             );
             
             console.log('📅 Date range results:', response.data);
@@ -189,8 +190,7 @@ const SuKienNhanKhauListPage = () => {
     // ========== XÓA SỰ KIỆN ==========
     const handleDelete = async (id) => {
         try {
-            await apiClient.delete(`/sukien/${id}`);
-            message.success('✅ Xóa sự kiện thành công');
+        await suKienApi.delete(id);
             
             // Reload data
             fetchStats();

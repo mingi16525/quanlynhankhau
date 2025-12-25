@@ -26,7 +26,7 @@ import {
   HomeOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import ghiNhanThayDoiApi from '../../api/ghiNhanThayDoiApi';
 import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
@@ -54,7 +54,7 @@ const GhiNhanThayDoiListPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/ghinhanthaydoi');
+      const response = await ghiNhanThayDoiApi.getAll();
       console.log('📥 Lịch sử thay đổi:', response.data);
       setData(response.data);
       setFilteredData(response.data);
@@ -110,7 +110,7 @@ const GhiNhanThayDoiListPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await apiClient.delete(`/ghinhanthaydoi/${id}`);
+      await ghiNhanThayDoiApi.delete(id);
       message.success('✅ Xóa bản ghi thành công');
       fetchData();
     } catch (error) {

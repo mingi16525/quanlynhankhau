@@ -95,7 +95,7 @@ public class VaiTroService {
         // if (taiKhoanRepository.existsByVaiTroId(id)) {
         //     throw new IllegalStateException("Không thể xóa vai trò đang được sử dụng");
         // }
-
+        
         vaiTroRepository.delete(vaiTro);
     }
 

@@ -25,7 +25,7 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import tamTruTamVangApi from '../../api/tamTruTamVangApi';
 import dayjs from 'dayjs';
 
 const { TabPane } = Tabs;
@@ -47,21 +47,7 @@ const TamTruTamVangListPage = () => {
     const fetchTamTru = async (tuNgay = null, denNgay = null) => {
         setLoading(true);
         try {
-            let url = '/tamtrutamvang/loai/tamtru';
-            const params = [];
-            
-            if (tuNgay) {
-                params.push(`tuNgay=${tuNgay}`);
-            }
-            if (denNgay) {
-                params.push(`denNgay=${denNgay}`);
-            }
-            
-            if (params.length > 0) {
-                url += '?' + params.join('&');
-            }
-            
-            const response = await apiClient.get(url);
+            const response = await tamTruTamVangApi.getTamTru(tuNgay, denNgay);
             console.log('📥 Tạm trú data:', response.data);
             setTamTruList(response.data);
         } catch (error) {
@@ -75,21 +61,7 @@ const TamTruTamVangListPage = () => {
     const fetchTamVang = async (tuNgay = null, denNgay = null) => {
         setLoading(true);
         try {
-            let url = '/tamtrutamvang/loai/tamvang';
-            const params = [];
-            
-            if (tuNgay) {
-                params.push(`tuNgay=${tuNgay}`);
-            }
-            if (denNgay) {
-                params.push(`denNgay=${denNgay}`);
-            }
-            
-            if (params.length > 0) {
-                url += '?' + params.join('&');
-            }
-            
-            const response = await apiClient.get(url);
+            const response = await tamTruTamVangApi.getTamVang(tuNgay, denNgay);
             console.log('📥 Tạm vắng data:', response.data);
             setTamVangList(response.data);
         } catch (error) {
@@ -146,7 +118,7 @@ const TamTruTamVangListPage = () => {
 
         setLoading(true);
         try {
-            const response = await apiClient.get(`/tamtrutamvang/search?keyword=${value}`);
+            const response = await tamTruTamVangApi.search(value);
             console.log('🔍 Search results:', response.data);
             
             // Filter theo loại hiện tại
@@ -174,7 +146,7 @@ const TamTruTamVangListPage = () => {
     // ========== XÓA ĐĂNG KÝ ==========
     const handleDelete = async (id) => {
         try {
-            await apiClient.delete(`/tamtrutamvang/${id}`);
+            await tamTruTamVangApi.delete(id);
             message.success('✅ Hủy đăng ký thành công');
             
             // Reload data

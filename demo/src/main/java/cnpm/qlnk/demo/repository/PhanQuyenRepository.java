@@ -1,5 +1,4 @@
 package cnpm.qlnk.demo.repository;
-import org.springframework.stereotype.Repository;
 import cnpm.qlnk.demo.entity.PhanQuyen;
 import cnpm.qlnk.demo.entity.VaiTro;
 

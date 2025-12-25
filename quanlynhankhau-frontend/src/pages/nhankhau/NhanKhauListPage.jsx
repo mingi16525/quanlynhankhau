@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, message, Space, Tag } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import nhanKhauApi from '../../api/nhanKhauAPI';
 import { PermissionCheck } from '../../components/PermissionCheck'; // Component kiểm tra quyền
 
 const NhanKhauListPage = () => {
@@ -14,7 +14,7 @@ const NhanKhauListPage = () => {
         setLoading(true);
         try {
             // Gọi API GET /api/nhankhau
-            const response = await apiClient.get('/nhankhau');
+            const response = await nhanKhauApi.getAll();
             setData(response.data);
         } catch (error) {
             message.error('Không thể tải dữ liệu nhân khẩu. Kiểm tra kết nối hoặc quyền hạn.');
@@ -32,7 +32,7 @@ const NhanKhauListPage = () => {
         if (window.confirm(`Cảnh báo: Chỉ xóa khi hồ sơ ${id} không phải là Chủ hộ. Bạn có chắc chắn muốn xóa?`)) {
             try {
                 // Gọi API DELETE /api/nhankhau/{id}
-                await apiClient.delete(`/nhankhau/${id}`);
+                await nhanKhauApi.delete(id);
                 message.success('Xóa hồ sơ thành công.');
                 fetchData(); // Tải lại dữ liệu
             } catch (error) {

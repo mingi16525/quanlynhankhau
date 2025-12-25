@@ -7,6 +7,9 @@ const hoKhauApi = {
   // Lấy theo ID
   getById: (id) => apiClient.get(`/hokhau/${id}`),
 
+  // Lấy thành viên của hộ
+  getThanhVien: (hoKhauId) => apiClient.get(`/hokhau/${hoKhauId}/thanhvien`),
+
   // Tạo mới
   create: (data) => apiClient.post('/hokhau', data),
 
@@ -16,8 +19,8 @@ const hoKhauApi = {
   // Xóa
   delete: (id) => apiClient.delete(`/hokhau/${id}`),
 
-  // Tìm kiếm
-  search: (keyword) => apiClient.get('/hokhau/search', { params: { keyword } })
+  // Tách hộ
+  tachHo: (hoKhauId, data) => apiClient.post(`/hokhau/${hoKhauId}/tach`, data)
 };
 
 export default hoKhauApi;

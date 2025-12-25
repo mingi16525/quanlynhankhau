@@ -20,7 +20,7 @@ import {
   CopyOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import nhanKhauApi from '../../api/nhanKhauAPI';
 import dayjs from 'dayjs';
 
 const { TextArea } = Input;
@@ -69,7 +69,7 @@ const NhanKhauFormPage = () => {
   const fetchNhanKhau = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get(`/nhankhau/${id}`);
+      const response = await nhanKhauApi.getById(id);
       const data = response.data;
       
       console.log('📥 Received data from API:', data);
@@ -111,10 +111,10 @@ const NhanKhauFormPage = () => {
       console.log('📤 Submitting payload:', payload);
 
       if (isEditMode && id) {
-        await apiClient.put(`/nhankhau/${id}`, payload);
+        await nhanKhauApi.update(id, payload);
         message.success('✅ Cập nhật nhân khẩu thành công');
       } else {
-        await apiClient.post('/nhankhau', payload);
+        await nhanKhauApi.create(payload);
         message.success(isCloneMode ? '✅ Sao chép thành công' : '✅ Thêm mới thành công');
       }
 

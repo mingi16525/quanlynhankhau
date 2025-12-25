@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, message, Space, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+import hoKhauApi from '../../api/hoKhauApi';
 import { PermissionCheck } from '../../components/PermissionCheck'; // Component kiểm tra quyền
 
 const HoKhauListPage = () => {
@@ -14,7 +14,7 @@ const HoKhauListPage = () => {
     setLoading(true);
     try {
       // Gọi API GET /api/hokhau
-      const response = await apiClient.get('/hokhau');
+      const response = await hoKhauApi.getAll();
       setData(response.data);
     } catch (error) {
       // Lỗi 403 (Forbidden) hoặc lỗi khác
@@ -39,7 +39,7 @@ const HoKhauListPage = () => {
       onOk: async () => {
         try {
           // Gọi API DELETE /api/hokhau/{id}
-          await apiClient.delete(`/hokhau/${id}`);
+          await hoKhauApi.delete(id);
           message.success('Xóa Sổ Hộ khẩu thành công.');
           fetchData(); // Tải lại dữ liệu
         } catch (error) {

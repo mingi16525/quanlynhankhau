@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form, Input, Button, message, DatePicker, Select, Modal, Table } from 'antd';
-import apiClient from '../../api/apiClient';
+import hoKhauApi from '../../api/hoKhauApi';
+import nhanKhauApi from '../../api/nhanKhauAPI';
+import thanhVienHoApi from '../../api/thanhVienHoApi';
 import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 
@@ -29,7 +31,7 @@ const HoKhauFormPage = () => {
         const fetchNhanKhaus = async () => {
             try {
                 // Lấy danh sách nhân khẩu chưa có hộ khẩu (available)
-                const res = await apiClient.get('/nhankhau/available'); 
+                const res = await nhanKhauApi.getAvailable(); 
                 setNhanKhauList(res.data);
                 setFilteredNhanKhau(res.data); // Hiển thị tất cả ban đầu
             } catch (err) {
@@ -42,7 +44,7 @@ const HoKhauFormPage = () => {
             fetchNhanKhaus();
         } else {
             // Ở chế độ edit, lấy tất cả nhân khẩu
-            apiClient.get('/nhankhau')
+            nhanKhauApi.getAll()
                 .then(res => {
                     setNhanKhauList(res.data);
                     setFilteredNhanKhau(res.data);
@@ -77,7 +79,7 @@ const HoKhauFormPage = () => {
     useEffect(() => {
         if (isEditMode) {
             // Lấy thông tin hộ khẩu
-            apiClient.get(`/hokhau/${id}`)
+            hoKhauApi.getById(id)
                 .then(res => {
                     let data = res.data;
                     
@@ -96,7 +98,7 @@ const HoKhauFormPage = () => {
                 .catch(err => message.error('Không tìm thấy hồ sơ Hộ khẩu.'));
             
             // Lấy danh sách thành viên của hộ
-            apiClient.get(`/thanhvienho/hokhau/${id}`)
+            thanhVienHoApi.getByHoKhau(id)
                 .then(res => {
                     setThanhVienList(res.data);
                 })
@@ -148,7 +150,7 @@ const HoKhauFormPage = () => {
                     thanhVienQuanHeList: thanhVienQuanHeList // Có thể null nếu không đổi chủ hộ
                 };
                 
-                await apiClient.put(`/hokhau/${id}`, payload);
+                await hoKhauApi.update(id, payload);
                 message.success('Cập nhật Hộ khẩu thành công!');
             } else {
                 // CREATE: Gửi yêu cầu POST /api/hokhau
@@ -157,7 +159,7 @@ const HoKhauFormPage = () => {
                     chuHo: { id: values.idChuHo }
                 };
                 
-                await apiClient.post('/hokhau', payload);
+                await hoKhauApi.create(payload);
                 message.success('Thêm mới Hộ khẩu thành công!');
             }
             navigate('/dashboard/hokhau'); 

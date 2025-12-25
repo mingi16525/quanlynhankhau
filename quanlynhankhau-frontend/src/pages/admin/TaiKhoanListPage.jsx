@@ -12,7 +12,7 @@ import {
   KeyOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '../../api/apiClient';
+// apiClient không cần thiết nữa, đã chuyển sang dùng adminApi
 
 const TaiKhoanListPage = () => {
   const navigate = useNavigate();
@@ -41,7 +41,7 @@ const TaiKhoanListPage = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/admin/taikhoan');
+      const response = await adminApi.getTaiKhoan();
       console.log('Fetched data:', response.data);
       setData(response.data);
       setFilteredData(response.data);
@@ -63,7 +63,7 @@ const TaiKhoanListPage = () => {
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await apiClient.delete(`/admin/taikhoan/${id}`);
+          await adminApi.deleteTaiKhoan(id);
           message.success('Xóa tài khoản thành công');
           fetchData();
         } catch (error) {
@@ -76,7 +76,7 @@ const TaiKhoanListPage = () => {
 
   const handleToggleLock = async (id, trangThai) => {
     try {
-      await apiClient.put(`/admin/taikhoan/${id}/lock`);
+      await adminApi.lockTaiKhoan(id);
       message.success(trangThai === 'Locked' ? 'Đã mở khóa tài khoản' : 'Đã khóa tài khoản');
       fetchData();
     } catch (error) {
@@ -93,9 +93,7 @@ const TaiKhoanListPage = () => {
       cancelText: 'Hủy',
       onOk: async () => {
         try {
-          await apiClient.put(`/admin/taikhoan/${id}/reset-password`, {
-            newPassword: 'password123' // Mật khẩu mặc định
-          });
+          await adminApi.resetPassword(id);
           message.success('Đã reset mật khẩu thành "password123"');
         } catch (error) {
           console.error('Error resetting password:', error);
