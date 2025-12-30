@@ -29,22 +29,34 @@ const HoKhauListPage = () => {
   }, []);
 
   // 2. Logic Xử lý Xóa Hộ khẩu
-  const handleDelete = (id) => {
+  const handleDelete = (id, record) => {
     Modal.confirm({
-      title: 'Xác nhận xóa Hộ khẩu',
-      content: 'CẢNH BÁO: Chỉ xóa khi Hộ khẩu không còn bất kỳ thành viên nào. Bạn có muốn tiếp tục?',
-      okText: 'Xóa',
+      title: 'Giải tán Hộ khẩu',
+      content: (
+        <div>
+          <p><strong>⚠️ CẢNH BÁO:</strong></p>
+          <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
+            <li>Sẽ xóa <strong>TẤT CẢ thành viên</strong> của hộ này</li>
+            <li>Tất cả nhân khẩu sẽ chuyển về trạng thái "Đã chuyển đi"</li>
+            <li>Bản ghi hộ khẩu sẽ bị xóa hoàn toàn</li>
+            <li><strong style={{ color: '#ff4d4f' }}>Hành động này KHÔNG THỂ HOÀN TÁC</strong></li>
+          </ul>
+        </div>
+      ),
+      okText: 'Xác nhận giải tán',
       okType: 'danger',
       cancelText: 'Hủy',
+      width: 500,
       onOk: async () => {
         try {
-          // Gọi API DELETE /api/hokhau/{id}
-          await hoKhauApi.delete(id);
-          message.success('Xóa Sổ Hộ khẩu thành công.');
+          // Gọi API DELETE /api/hokhau/{id}/force
+          await hoKhauApi.deleteWithMembers(id);
+          message.success('✅ Đã giải tán hộ khẩu và xóa tất cả thành viên thành công');
           fetchData(); // Tải lại dữ liệu
         } catch (error) {
-          // Xử lý lỗi nếu Hộ khẩu còn thành viên (HTTP 409 Conflict)
-          message.error('Lỗi: Không thể xóa Hộ khẩu (Vẫn còn thành viên).');
+          // Xử lý lỗi
+          const errorMsg = error.response?.data?.message || 'Lỗi khi xóa hộ khẩu';
+          message.error(errorMsg);
         }
       },
     });
@@ -82,13 +94,13 @@ const HoKhauListPage = () => {
             </Button>
           </PermissionCheck>
           
-          {/* Nút XÓA - Cần quyền HO_KHAU:DELETE */}
+          {/* Nút GIẢI TÁN - Cần quyền HO_KHAU:DELETE */}
           <PermissionCheck permission="HO_KHAU:DELETE">
             <Button 
               danger 
-              onClick={() => handleDelete(record.id)}
+              onClick={() => handleDelete(record.id, record)}
             >
-              Xóa
+              Giải tán
             </Button>
           </PermissionCheck>
         </Space>

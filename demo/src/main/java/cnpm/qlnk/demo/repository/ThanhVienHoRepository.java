@@ -18,4 +18,7 @@ public interface ThanhVienHoRepository extends JpaRepository<ThanhVienHo, Intege
 
     List<ThanhVienHo> findByHoKhau_Id(Integer hoKhauId);
 
+    // Xóa tất cả thành viên của hộ khẩu (dùng cho xóa toàn bộ hộ)
+    void deleteByHoKhau_Id(Integer hoKhauId);
+
 }

@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/thongke")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class ThongKeController {
 
     @Autowired

@@ -88,6 +88,24 @@ public class HoKhauController {
         }
     }
 
+    // DELETE /api/hokhau/{id}/force: Xóa HoKhau kèm tất cả thành viên (Force Delete)
+    @PreAuthorize("hasAuthority('HO_KHAU:DELETE') or hasAuthority('*:*')")
+    @DeleteMapping("/{id}/force")
+    public ResponseEntity<?> deleteHoKhauForce(@PathVariable Integer id) {
+        try {
+            hoKhauService.deleteHoKhauWithMembers(id);
+            return ResponseEntity.ok().body(new SuccessResponse("Đã xóa hộ khẩu và tất cả thành viên thành công"));
+        } catch (IllegalArgumentException e) {
+            // Không tìm thấy hộ khẩu
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            // Lỗi không xác định
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Lỗi khi xóa hộ khẩu: " + e.getMessage()));
+        }
+    }
+
     // POST /api/hokhau/{id}/tach: Tách hộ khẩu
     @PreAuthorize("hasAuthority('HO_KHAU:CREATE') or hasAuthority('*:*')")
     @PostMapping("/{id}/tach")
@@ -104,6 +122,23 @@ public class HoKhauController {
         } catch (Exception e) {
             // Lỗi không xác định
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi khi tách hộ: " + e.getMessage());
+        }
+    }
+
+    // Inner classes for response messages
+    private static class SuccessResponse {
+        public String message;
+        
+        public SuccessResponse(String message) {
+            this.message = message;
+        }
+    }
+
+    private static class ErrorResponse {
+        public String message;
+        
+        public ErrorResponse(String message) {
+            this.message = message;
         }
     }
 }

@@ -16,8 +16,11 @@ const hoKhauApi = {
   // Cập nhật
   update: (id, data) => apiClient.put(`/hokhau/${id}`, data),
 
-  // Xóa
+  // Xóa (chỉ xóa khi không còn thành viên)
   delete: (id) => apiClient.delete(`/hokhau/${id}`),
+
+  // Xóa hộ khẩu kèm tất cả thành viên (Force Delete)
+  deleteWithMembers: (id) => apiClient.delete(`/hokhau/${id}/force`),
 
   // Tách hộ
   tachHo: (hoKhauId, data) => apiClient.post(`/hokhau/${hoKhauId}/tach`, data)

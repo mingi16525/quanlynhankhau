@@ -36,4 +36,7 @@ public interface GhiNhanThayDoiHoKhauRepository extends JpaRepository<GhiNhanTha
     // Tìm kiếm trong mô tả
     @Query("SELECT g FROM GhiNhanThayDoiHoKhau g WHERE LOWER(g.moTa) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(g.tenSuKien) LIKE LOWER(CONCAT('%', :keyword, '%')) ORDER BY g.ngayGhiNhan DESC")
     List<GhiNhanThayDoiHoKhau> searchByKeyword(@Param("keyword") String keyword);
+    
+    // Xóa tất cả bản ghi ghi nhận thay đổi của một hộ khẩu
+    void deleteByHoKhau_Id(Integer hoKhauId);
 }

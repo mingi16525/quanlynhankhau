@@ -17,7 +17,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/chi")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class DanhSachChiController {
 
     @Autowired

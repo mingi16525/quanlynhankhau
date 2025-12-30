@@ -130,4 +130,38 @@ public class ThanhVienHoService {
 
         return thanhVienHoRepository.save(existingTvh);
     }
+
+    /**
+     * Xóa TẤT CẢ thành viên của hộ khẩu (bao gồm cả chủ hộ).
+     * Hàm này được dùng khi muốn xóa toàn bộ hộ khẩu hoặc reset hộ khẩu.
+     * 
+     * @param hoKhauId ID của hộ khẩu cần xóa tất cả thành viên
+     */
+    @Transactional
+    public void deleteAllThanhVienByHoKhau(Integer hoKhauId) {
+        // Lấy danh sách tất cả thành viên của hộ khẩu
+        var thanhVienList = thanhVienHoRepository.findByHoKhau_Id(hoKhauId);
+        
+        if (thanhVienList.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy thành viên nào trong hộ khẩu với ID: " + hoKhauId);
+        }
+        
+        // Cập nhật trạng thái cho tất cả nhân khẩu trước khi xóa
+        for (ThanhVienHo tvh : thanhVienList) {
+            NhanKhau nhanKhau = tvh.getNhanKhau();
+            nhanKhau.setTinhTrang("Đã chuyển đi");
+            nhanKhauRepository.save(nhanKhau);
+        }
+        
+        // Ghi nhận thay đổi (xóa toàn bộ hộ khẩu)
+        if (!thanhVienList.isEmpty()) {
+            ghiNhanThayDoiService.ghiNhanXoaThanhVien(
+                thanhVienList.get(0).getHoKhau(), 
+                "Xóa toàn bộ " + thanhVienList.size() + " thành viên của hộ khẩu"
+            );
+        }
+        
+        // Xóa tất cả thành viên (kể cả chủ hộ)
+        thanhVienHoRepository.deleteByHoKhau_Id(hoKhauId);
+    }
 }

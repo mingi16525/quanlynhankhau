@@ -41,3 +41,14 @@ Data/
 Thumbs.db
 ehthumbs.db
 desktop.ini
+
+# ===== IDE files =====
+.vscode/
+*.code-workspace
+
+*.sql
+*.md
+!README.md
+
+*.ps1
+

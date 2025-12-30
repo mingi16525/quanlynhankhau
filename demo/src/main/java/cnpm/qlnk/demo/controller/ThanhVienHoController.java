@@ -79,4 +79,31 @@ public class ThanhVienHoController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // DELETE /api/thanhvienho/hokhau/{hoKhauId}: Xóa TẤT CẢ thành viên của hộ khẩu (kể cả chủ hộ)
+    @PreAuthorize("hasAuthority('THANH_VIEN_HO:DELETE') or hasAuthority('*:*')")
+    @DeleteMapping("/hokhau/{hoKhauId}")
+    public ResponseEntity<?> deleteAllThanhVienByHoKhau(@PathVariable Integer hoKhauId) {
+        try {
+            thanhVienHoService.deleteAllThanhVienByHoKhau(hoKhauId);
+            return ResponseEntity.ok().body(new SuccessResponse("Đã xóa tất cả thành viên của hộ khẩu thành công"));
+        } catch (IllegalArgumentException e) {
+            // Không tìm thấy hộ khẩu hoặc không có thành viên
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            // Lỗi khác
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Lỗi hệ thống: " + e.getMessage()));
+        }
+    }
+
+    // Inner class để trả về success message
+    private static class SuccessResponse {
+        public String message;
+        
+        public SuccessResponse(String message) {
+            this.message = message;
+        }
+    }
 }

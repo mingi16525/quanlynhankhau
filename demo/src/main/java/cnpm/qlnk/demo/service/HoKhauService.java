@@ -32,6 +32,8 @@ public class HoKhauService {
     private NhanKhauRepository nhanKhauRepository;
     @Autowired
     private GhiNhanThayDoiHoKhauService ghiNhanThayDoiService;
+    @Autowired
+    private cnpm.qlnk.demo.repository.GhiNhanThayDoiHoKhauRepository ghiNhanThayDoiRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -240,6 +242,44 @@ public class HoKhauService {
         // 2. Tiến hành xóa
         hoKhauRepository.deleteById(id);
         return true;
+    }
+
+    /**
+     * 5. Xóa hộ khẩu kèm tất cả thành viên (Force Delete)
+     * Dùng khi muốn xóa toàn bộ hộ khẩu mà không cần xóa thủ công từng thành viên.
+     * 
+     * @param hoKhauId ID của hộ khẩu cần xóa
+     */
+    @Transactional
+    public void deleteHoKhauWithMembers(Integer hoKhauId) {
+        // Kiểm tra hộ khẩu có tồn tại không
+        if (!hoKhauRepository.existsById(hoKhauId)) {
+            throw new IllegalArgumentException("Không tìm thấy hộ khẩu với ID: " + hoKhauId);
+        }
+
+        // 1. Xóa tất cả thành viên nếu có (cập nhật trạng thái nhân khẩu)
+        if (thanhVienHoRepository.existsByHoKhau_Id(hoKhauId)) {
+            var thanhVienList = thanhVienHoRepository.findByHoKhau_Id(hoKhauId);
+            
+            // Cập nhật trạng thái cho tất cả nhân khẩu trước khi xóa
+            for (ThanhVienHo tvh : thanhVienList) {
+                NhanKhau nhanKhau = tvh.getNhanKhau();
+                nhanKhau.setTinhTrang("Đã chuyển đi");
+                nhanKhauRepository.save(nhanKhau);
+            }
+            
+            // Xóa tất cả thành viên
+            thanhVienHoRepository.deleteByHoKhau_Id(hoKhauId);
+        }
+
+        // 2. Xóa các bản ghi ghi nhận thay đổi liên quan đến hộ khẩu
+        ghiNhanThayDoiRepository.deleteByHoKhau_Id(hoKhauId);
+
+        // 3. Xóa các bản ghi liên quan khác nếu cần
+        // Ví dụ: tamTruTamVangRepository.deleteByHoKhau_Id(hoKhauId);
+
+        // 4. Xóa bản ghi hộ khẩu
+        hoKhauRepository.deleteById(hoKhauId);
     }
 
     // Lấy danh sách thành viên theo hộ khẩu ID

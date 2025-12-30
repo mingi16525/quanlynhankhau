@@ -16,7 +16,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tamtrutamvang")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class TamTruTamVangController {
 
     @Autowired

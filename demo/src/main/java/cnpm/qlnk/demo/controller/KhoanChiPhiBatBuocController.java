@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/khoanphi")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class KhoanChiPhiBatBuocController {
 
     @Autowired

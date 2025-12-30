@@ -12,7 +12,7 @@ import {
   KeyOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-// apiClient không cần thiết nữa, đã chuyển sang dùng adminApi
+import adminApi from '../../api/adminApi';
 
 const TaiKhoanListPage = () => {
   const navigate = useNavigate();

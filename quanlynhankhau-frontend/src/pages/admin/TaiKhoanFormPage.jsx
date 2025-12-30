@@ -35,7 +35,7 @@ const TaiKhoanFormPage = () => {
         
         setLoading(true);
         try {
-            const response = await apiClient.get(`/admin/taikhoan/${id}`);
+            const response = await adminApi.getTaiKhoanById(id);
             const data = response.data;
             console.log('Tài khoản:', data);
             
@@ -222,7 +222,7 @@ const TaiKhoanFormPage = () => {
                 >
                     <Select 
                         placeholder="Chọn vai trò"
-                        disabled={isEditMode && initialData?.tenDangNhap === 'admin'}
+                        disabled={initialData?.tenDangNhap === 'admin'}
                     >
                         {vaiTroList.map(vt => (
                             <Option key={vt.id} value={vt.id}>
